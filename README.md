@@ -3,6 +3,8 @@ CURL
 
 Pong With Better Physics &amp; Game Dynamics
 
+Released Under the MIT Open Source License. A short, permissive software license. Basically, **you can do whatever you want as long as you include the original copyright and license**.
+
 16 May'14 :
 - Felt like making a game on my way home.
 - MULTIPLAYER MUST COME SOMETIME SOON

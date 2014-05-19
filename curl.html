@@ -1,0 +1,313 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link href='http://fonts.googleapis.com/css?family=Electrolize' rel='stylesheet' type='text/css'>
+		<style  type="text/css">
+			body {
+				font-family: 'Electrolize', sans-serif;
+				margin: 0;
+				overflow-x: hidden;
+				overflow-y: hidden;
+				-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
+				background-color: #080817;
+				color:white;
+			}
+			h1{ font-size:30vh;  }
+			h2{ font-size:10vh; }
+			h5{ font-size:5vh; }
+			.pongBall{
+				position:absolute;
+				height:2vh;
+				width:2vh;
+				color: #FFF;
+				background: #FFF;
+				-webkit-border-radius: 2vh;
+    			-moz-border-radius: 2vh;
+    			border-radius: 2vh;
+    			border: solid 2px #FFF;
+			}
+			.pongScore{
+				position:relative;
+				margin:0;
+				display: inline-block;
+				font-size:10vh;
+				padding-top:2vh;
+			}
+			.pongBat{
+				position:absolute;
+				height:20vh;
+				width:5vh;
+				color: #EEE;
+				background: #EEE;
+    			border: solid 2px #FFF;
+			}
+			.pongWall{
+				position:absolute;
+				height:2vh;
+				width:100vw;
+				left:0;
+				color: #FFF;
+				background: #FFF;
+    			border: solid 2px #FFF;
+			}
+			.menuBtn {
+				height:8vh;
+				width:50vw;
+				font-size:7vh;
+				padding: 0.5vh 15px;
+    			background: #080817;
+    			color: #FFF;
+    			-webkit-border-radius: 4px;
+    			-moz-border-radius: 4px;
+    			border-radius: 4px;
+    			border: solid 2px #C2DCEB;
+    			-webkit-transition-duration: 0.2s;
+   			-moz-transition-duration: 0.2s;
+    			transition-duration: 0.2s;
+    			-webkit-user-select:none;
+    			-moz-user-select:none;
+    			-ms-user-select:none;
+    			user-select:none;
+    			margin-bottom:2vh;
+    		}
+    		.menuBtn:hover {
+    			background: #1F345C;
+    			border: solid 2px #C2DCEB;
+    			text-decoration: none;
+    		}
+			.menuBtn:active {
+    			-webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+    			-moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+    			box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+				background: #C2DCEB;
+    			border: solid 2px #C2DCEB;
+    		}
+		</style>
+	</head>
+	<body>
+		<div id="mainMenu" style="position:fixed; left:0vw; width:100vw;">
+			<center>
+				<h1 style="top:0%;margin-top:5vh; margin-bottom:0vh;">CURL</h1>
+				<h5 style="top:0%;margin-top:-6vh; margin-bottom:10vh;">A Game By Ragul Balaji 2014</h5>
+				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); startGame();">START</div>
+				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); alert('Work In Progress');"><strike>SETTINGS</strike></div>
+				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); test = new Audio('http://upload.wikimedia.org/wikipedia/en/7/79/Laid_Back-_White_Horse.ogg'); test.loop = true; alert('RAGUL BALAJI & CONTRIBUTORS'); test.play();"><strike>CREDITS</strike></div>
+			</center>
+		</div>
+		<div id="gameState" style="position:fixed; left:0; top:0;">
+				<div id="topbar" style="position:fixed; width:100vw; left:0vw; top:0vh;">
+					<center>
+					<h2 id="leftScore" class="pongScore" style="float:left;">0</h2>
+					<h2 style="font-size:15vh; float:center; display: inline-block; margin-top:-2vh;">CURL</h2>
+					<h2 id="rightScore" class="pongScore" style="float:right;">0</h2>
+					</center>
+				</div>
+				<div id="wallTop" class="pongWall" style="top:15vh;"></div>
+				<div id="leftBat" class="pongBat" style="float:left;"></div>
+				<div id="Ball" class="pongBall"></div>
+				<div id="rightBat" class="pongBat" style="float:right;"></div>
+				<div id="wallBottom" class="pongWall" style="top:97vh;"></div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var WIDTH = window.innerWidth,HEIGHT = window.innerHeight, delta;
+		var lastFrame,delta,time,fps = 0,tempfps,lastFPS = getTime();
+		var btnPressSnd = new Audio("https://ia902504.us.archive.org/22/items/RagulPong/BtnPress.wav");
+		var ballHitWallSnd = new Audio("https://ia902504.us.archive.org/22/items/RagulPong/BallHitWall.wav");
+		var ballHitBatSnd = new Audio("https://ia902504.us.archive.org/22/items/RagulPong/BallHitBat.wav");
+		var PointScoredSnd = new Audio("https://ia902504.us.archive.org/22/items/RagulPong/PointScored.wav");
+		var leftBatElement = document.getElementById("leftBat"),rightBatElement = document.getElementById("rightBat"),BallElement = document.getElementById("Ball");
+		var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState");
+		var leftScoreEle = document.getElementById("leftScore"), rightScoreEle = document.getElementById("rightScore");
+		var gameLoopVar, gameRunning;
+		var Ball , leftBat, rightBat;
+		var leftScore, rightScore;
+		var ballBounceEfficiency = 0.999, batMoveVelocity = 0.2, batBallFrictionCoeff = 0.5;
+		var CurrentState = 0, State = {MainMenu:1, Game:2};
+		var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
+		var keys = new Array(255),oldKeys = new Array(255);
+		
+		function gotoState(id){
+			if(id == State.MainMenu){
+				mainMenu.style.display="block";
+				gameState.style.display="none";
+			}else if(id == State.Game){
+				mainMenu.style.display="none";
+				gameState.style.display="block";
+			}
+		}
+		
+		function setObjToEle(obj, ele){
+			ele.style.left = obj.x;
+			ele.style.top = obj.y;
+		}
+		
+		function startGame(){
+			gotoState(State.Game);
+			gameRunning = true;
+			leftScore = 0;
+			rightScore = 0;
+			getDelta();
+			Ball = new gameObj(WIDTH/2-HEIGHT/100,11*HEIGHT/20,0,0);
+			leftBat = new gameObj((HEIGHT*5)/100,HEIGHT*23/50,0,0);
+			rightBat = new gameObj(WIDTH - 2*((HEIGHT*5)/100),HEIGHT*23/50,0,0);
+			//init
+			Ball.vx = (randInt(3,8)/10)-0.5;
+			Ball.vy = Math.random()-0.5;
+			setObjToEle(Ball, BallElement);
+			setObjToEle(leftBat, leftBatElement);
+			setObjToEle(rightBat, rightBatElement);
+			//
+			gameLoopVar = setInterval(gameLoop,0);
+		}
+		function input(){
+			leftBat.vy = 0;
+			if(keys[87] || keys[38]){
+				leftBat.vy = -batMoveVelocity;
+			}else if(keys[83] || keys[40]){
+				leftBat.vy = batMoveVelocity;
+			}else if(keys[27]){ //Esc
+				gameLoopVar = clearInterval(gameLoopVar);
+			}else if(keys[80] && !oldKeys[80]){ //Pause-P
+				if(gameRunning){
+					gameRunning = false;
+					gameLoopVar = clearInterval(gameLoopVar);
+				}else{
+					gameRunning = true;
+					getDelta();
+					gameLoopVar = setInterval(gameLoop,0);
+				}
+			}
+		}
+		function touch(x, y, action) {
+			leftBat.vy = 0;
+			if(x <= WIDTH/2 && action){
+				if(y < leftBat.y+(HEIGHT*9/100)){
+					leftBat.vy = -batMoveVelocity;
+				}else if(y > leftBat.y+(HEIGHT*9/100)){
+					leftBat.vy = batMoveVelocity;
+				}
+			}
+      }
+		function gameLoop(){
+			getDelta();
+			//updates
+			if(Ball.x <= XMin){ // LEFTHIT
+				PointScoredSnd.play();
+				Ball.x = WIDTH/2-HEIGHT/100;
+				Ball.y = 11*HEIGHT/20;
+				Ball.vx = (randInt(3,8)/10);
+				Ball.vy = Math.random()-0.5;
+				rightScore++;
+			}else if(Ball.x >= XMax){ //RIGHTHIT
+				PointScoredSnd.play();
+				Ball.x = WIDTH/2-HEIGHT/100;
+				Ball.y = 11*HEIGHT/20;
+				Ball.vx = (randInt(3,8)/-10);
+				Ball.vy = Math.random()-0.5;
+				leftScore++;
+			}
+			if(Ball.y >= YMax ||  Ball.y <= YMin){ 
+				ballHitWallSnd.play();
+				Ball.vy = -ballBounceEfficiency *Ball.vy;
+				if(Ball.y >= YMax){
+					Ball.y = YMax;
+				}else{
+					Ball.y = YMin;
+				}
+			}
+			if(Ball.y > rightBat.y+(HEIGHT*9/100)){
+				rightBat.vy = batMoveVelocity;
+			}else if(Ball.y < rightBat.y+(HEIGHT*9/100)){
+				rightBat.vy = -batMoveVelocity;
+			}else{
+				rightBat.vy = 0;
+			}
+			if(Ball.x+(HEIGHT*2/100) >= rightBat.x && Ball.x+(HEIGHT*2/100) <= rightBat.x+(HEIGHT*5/100) && Ball.y+(HEIGHT*1/100) >= rightBat.y && Ball.y+(HEIGHT*1/100) <= rightBat.y+(HEIGHT*20/100)){
+				ballHitBatSnd.play();
+				Ball.x=rightBat.x-2*HEIGHT/100;
+				Ball.vx=-ballBounceEfficiency *Ball.vx;
+				Ball.vx += batBallFrictionCoeff*0.1*rightBat.vy;
+				Ball.vy += batBallFrictionCoeff*rightBat.vy;
+			}else if(Ball.x <= leftBat.x+(HEIGHT*5/100) && Ball.x >= leftBat.x && Ball.y+(HEIGHT*1/100) >= leftBat.y && Ball.y+(HEIGHT*1/100) <= leftBat.y+(HEIGHT*20/100)){
+				ballHitBatSnd.play();
+				Ball.x=leftBat.x+7*HEIGHT/100;
+				Ball.vx=-ballBounceEfficiency *Ball.vx;
+				Ball.vx += batBallFrictionCoeff*0.1*leftBat.vy;
+				Ball.vy += batBallFrictionCoeff*leftBat.vy;
+			}
+			if(rightBat.y >= YMax-(HEIGHT*19/100)){
+				rightBat.y = YMax-(HEIGHT*19/100);
+			}else if(rightBat.y <= YMin+(HEIGHT/100)){
+				rightBat.y = YMin+(HEIGHT/100);
+			}
+			if(leftBat.y >= YMax-(HEIGHT*19/100)){
+				leftBat.y = YMax-(HEIGHT*19/100);
+			}else if(leftBat.y <= YMin+(HEIGHT/100)){
+				leftBat.y = YMin+(HEIGHT/100);
+			}
+			leftBat.x += leftBat.vx*delta;
+			leftBat.y += leftBat.vy*delta;
+			rightBat.x += rightBat.vx*delta;
+			rightBat.y += rightBat.vy*delta;
+			Ball.x += Ball.vx*delta;
+			Ball.y += Ball.vy*delta;
+			//
+			gameRender();
+			updateFPS();
+		}
+		function gameRender(){
+			setObjToEle(Ball, BallElement);
+			setObjToEle(leftBat, leftBatElement);
+			setObjToEle(rightBat, rightBatElement);
+			leftScoreEle.innerHTML = leftScore;
+			rightScoreEle.innerHTML = rightScore;
+		}
+		function gameObj(px,py, pvx, pvy){
+			this.x = px;
+			this.y = py;
+			this.vx = pvx;
+			this.vy = pvy;
+		}
+		function getTime() {return Date.now();}
+		function updateFPS() {
+			if (getTime() - lastFPS > 1000) {
+				console.log(fps);// FPS OUTPUT
+				fps = tempfps;
+				tempfps = 0; 
+				lastFPS += 1000;
+			}
+			tempfps++;
+		}
+		function getDelta() {
+			time = getTime();
+			delta = (time - lastFrame);
+			lastFrame = time;	
+		}
+		function randInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+   	}
+		!function(a,b,c,d,e,f,g,h,i){function j(a){var b,c=a.length,e=this,f=0,g=e.i=e.j=0,h=e.S=[];for(c||(a=[c++]);d>f;)h[f]=f++;for(f=0;d>f;f++)h[f]=h[g=r&g+a[f%c]+(b=h[f])],h[g]=b;(e.g=function(a){for(var b,c=0,f=e.i,g=e.j,h=e.S;a--;)b=h[f=r&f+1],c=c*d+h[r&(h[f]=h[g=r&g+b])+(h[g]=b)];return e.i=f,e.j=g,c})(d)}function k(a,b){var c,d=[],e=typeof a;if(b&&"object"==e)for(c in a)try{d.push(k(a[c],b-1))}catch(f){}return d.length?d:"string"==e?a:a+"\0"}function l(a,b){for(var c,d=a+"",e=0;e<d.length;)b[r&e]=r&(c^=19*b[r&e])+d.charCodeAt(e++);return n(b)}function m(c){try{return a.crypto.getRandomValues(c=new Uint8Array(d)),n(c)}catch(e){return[+new Date,a,(c=a.navigator)&&c.plugins,a.screen,n(b)]}}function n(a){return String.fromCharCode.apply(0,a)}var o=c.pow(d,e),p=c.pow(2,f),q=2*p,r=d-1,s=c["seed"+i]=function(a,f,g){var h=[];f=1==f?{entropy:!0}:f||{};var r=l(k(f.entropy?[a,n(b)]:null==a?m():a,3),h),s=new j(h);return l(n(s.S),b),(f.pass||g||function(a,b,d){return d?(c[i]=a,b):a})(function(){for(var a=s.g(e),b=o,c=0;p>a;)a=(a+c)*d,b*=d,c=s.g(1);for(;a>=q;)a/=2,b/=2,c>>>=1;return(a+c)/b},r,"global"in f?f.global:this==c)};l(c[i](),b),g&&g.exports?g.exports=s:h&&h.amd&&h(function(){return s})}(this,[],Math,256,6,52,"object"==typeof module&&module,"function"==typeof define&&define,"random");
+		
+		window.onkeydown = function (e) {
+    		keys[e.keyCode] = true;
+    		oldKeys[e.keyCode] = false;
+    		input();
+		};
+		window.onkeyup = function (e) {
+    		keys[e.keyCode] = false;
+    		oldKeys[e.keyCode] = true;
+    		input();
+		};
+		window.addEventListener('touchstart', function(e) {
+        touch(e.changedTouches[0].pageX, e.changedTouches[0].pageY, true);
+      }, false);
+     window.addEventListener('touchmove', function(e) {
+      	e.preventDefault();
+      	touch(e.targetTouches[0].pageX, e.targetTouches[0].pageY, true);
+      }, false);
+		//Math.seedrandom(2000);
+		gotoState(State.MainMenu);
+		//startGame();
+	</script>
+</html>

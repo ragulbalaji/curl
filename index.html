@@ -152,8 +152,11 @@
 			leftBat = new gameObj((HEIGHT*5)/100,HEIGHT*23/50,0,0);
 			rightBat = new gameObj(WIDTH - 2*((HEIGHT*5)/100),HEIGHT*23/50,0,0);
 			//init
-			Ball.vx = (randInt(3,8)/10)-0.5;
-			Ball.vy = Math.random()-0.5;
+			if(randInt(1,2)==1){
+				resetBall(1);
+			}else{
+				resetBall(-1);
+			}
 			setObjToEle(Ball, BallElement);
 			setObjToEle(leftBat, leftBatElement);
 			setObjToEle(rightBat, rightBatElement);
@@ -194,17 +197,11 @@
 			//updates
 			if(Ball.x <= XMin){ // LEFTHIT
 				PointScoredSnd.play();
-				Ball.x = WIDTH/2-HEIGHT/100;
-				Ball.y = 11*HEIGHT/20;
-				Ball.vx = (randInt(3,8)/10);
-				Ball.vy = Math.random()-0.5;
+				resetBall(1);
 				rightScore++;
 			}else if(Ball.x >= XMax){ //RIGHTHIT
 				PointScoredSnd.play();
-				Ball.x = WIDTH/2-HEIGHT/100;
-				Ball.y = 11*HEIGHT/20;
-				Ball.vx = (randInt(3,8)/-10);
-				Ball.vy = Math.random()-0.5;
+				resetBall(-1);
 				leftScore++;
 			}
 			if(Ball.y >= YMax ||  Ball.y <= YMin){
@@ -268,6 +265,12 @@
 			this.y = py;
 			this.vx = pvx;
 			this.vy = pvy;
+		}
+		function resetBall(direction){
+			Ball.x = WIDTH/2-HEIGHT/100;
+			Ball.y = 11*HEIGHT/20;
+			Ball.vx = (randInt(3,8)/(10*direction));
+			Ball.vy = Math.random()-0.5;
 		}
 		function getTime() {return Date.now();}
 		function updateFPS() {

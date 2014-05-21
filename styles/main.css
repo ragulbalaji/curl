@@ -1,0 +1,79 @@
+body {
+ font-family: 'Electrolize', sans-serif;
+ margin: 0;
+ overflow-x: hidden;
+ overflow-y: hidden;
+ -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
+ background-color: #080817;
+ color:white;
+}
+h1{ font-size:30vh;  }
+h2{ font-size:10vh; }
+h5{ font-size:5vh; }
+.pongBall{
+ position:absolute;
+ height:2vh;
+ width:2vh;
+ color: #FFF;
+ background: #FFF;
+ -webkit-border-radius: 2vh;
+    -moz-border-radius: 2vh;
+    border-radius: 2vh;
+    border: solid 2px #FFF;
+}
+.pongScore{
+ position:relative;
+ margin:0;
+ display: inline-block;
+ font-size:10vh;
+ padding-top:2vh;
+}
+.pongBat{
+ position:absolute;
+ height:20vh;
+ width:5vh;
+ color: #EEE;
+ background: #EEE;
+    border: solid 2px #FFF;
+}
+.pongWall{
+ position:absolute;
+ height:2vh;
+ width:100vw;
+ left:0;
+ color: #FFF;
+ background: #FFF;
+    border: solid 2px #FFF;
+}
+.menuBtn {
+ height:8vh;
+ width:50vw;
+ font-size:7vh;
+ padding: 0.5vh 15px;
+    background: #080817;
+    color: #FFF;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border: solid 2px #C2DCEB;
+    -webkit-transition-duration: 0.2s;
+   -moz-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    margin-bottom:2vh;
+   }
+   .menuBtn:hover {
+    background: #1F345C;
+    border: solid 2px #C2DCEB;
+    text-decoration: none;
+   }
+.menuBtn:active {
+    -webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+    -moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+ background: #C2DCEB;
+    border: solid 2px #C2DCEB;
+   }

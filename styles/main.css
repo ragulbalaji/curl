@@ -1,3 +1,17 @@
+@keyframes splashtaganim{
+   0%{margin-left:0vw;}
+   33%{margin-left:-2vw;}
+   66%{margin-left:0vw;}
+   100%{margin-left:2vw;}
+}
+
+@-webkit-keyframes splashtaganim{
+   0%{margin-left:0vw;}
+   33%{margin-left:-2vw;}
+   66%{margin-left:0vw;}
+   100%{margin-left:2vw;}
+}
+
 body {
    font-family: 'Electrolize', sans-serif;
    margin: 0;
@@ -44,6 +58,10 @@ h5{ font-size:5vh; }
    color: #FFF;
    background: #FFF;
    border: solid 2px #FFF;
+}
+.splashtag{
+   animation:splashtaganim 2s infinite linear;
+   -webkit-animation:splashtaganim 2s infinite linear;
 }
 .menuBtn {
    height:8vh;

@@ -8,17 +8,19 @@ var leftBatElement = document.getElementById("leftBat"),rightBatElement = docume
 var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState");
 var leftScoreEle = document.getElementById("leftScore"), rightScoreEle = document.getElementById("rightScore");
 var gameLoopVar, gameRunning;
-var Ball , leftBat, rightBat;
+var Ball, leftBat, rightBat;
 var leftScore, rightScore;
 var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.5;
 var CurrentState = 0, State = {MainMenu:1, Game:2};
 var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
 var keys = new Array(255),oldKeys = new Array(255);
+var splashes = ["A Ball Game with Physics","PONG IS BACK!","I was bored, so I made this.","Ping Pong Anyone?","Let's Dance","As seen on TV!","100% pure!","Made by Ragul","Singleplayer!","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
 
 function gotoState(id){
    if(id == State.MainMenu){
       mainMenu.style.display="block";
       gameState.style.display="none";
+      document.getElementById("splash").innerHTML = splashes[randInt(0,splashes.length-1)];
    }else if(id == State.Game){
       mainMenu.style.display="none";
       gameState.style.display="block";
@@ -54,13 +56,13 @@ function startGame(){
    gameLoopVar = setInterval(gameLoop,0);
 }
 function input(){
-   leftBat.vy = 0;
    if(keys[87] || keys[38]){
       leftBat.vy = -batMoveVelocity;
    }else if(keys[83] || keys[40]){
       leftBat.vy = batMoveVelocity;
    }else if(keys[27]){ //Esc
       gameLoopVar = clearInterval(gameLoopVar);
+      gotoState(State.MainMenu);
    }else if(keys[80] && !oldKeys[80]){ //Pause-P
       if(gameRunning){
          gameRunning = false;
@@ -70,6 +72,8 @@ function input(){
          getDelta();
          gameLoopVar = setInterval(gameLoop,0);
       }
+   }else{
+      leftBat.vy = 0;
    }
 }
 function touch(x, y, action) {
@@ -199,6 +203,10 @@ window.addEventListener('touchmove', function(e) {
    e.preventDefault();
    touch(e.targetTouches[0].pageX, e.targetTouches[0].pageY, true);
 }, false);
-//Math.seedrandom(2000);
-gotoState(State.MainMenu);
-//startGame();
+
+function main(){
+   //Math.seedrandom(2000);
+   gotoState(State.MainMenu);
+   //startGame();
+}
+main();

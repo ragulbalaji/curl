@@ -97,6 +97,7 @@ function gameLoop(){
    if(Ball.y >= YMax ||  Ball.y <= YMin){
       ballHitWallSnd.play();
       Ball.vy = -ballBounceEfficiency *Ball.vy;
+      Ball.vx = -ballBounceEfficiency *Ball.vx;
       if(Ball.y >= YMax){
          Ball.y = YMax;
       }else{

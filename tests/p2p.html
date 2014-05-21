@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+		<script type="text/javascript">
+			var userid = prompt("userid?");
+			document.title = userid;
+			var peer = new Peer(userid, {key: 'nkp6d8culreh4cxr'}); 
+			var connectto;
+			var datatosend;
+			var conn;
+			peer.on('connection', function(conn) {
+				conn.on('data', function(data){
+					document.body.innerHTML += "<br>"+conn.peer+" > "+data;
+				});
+			});
+			function connect(){
+				connectto = prompt("connect to?");
+				conn = peer.connect(connectto);
+				
+				conn.on('open', function(){
+					document.body.innerHTML += "<br> CONNECTED TO "+conn.peer;
+				});
+			}
+			function send(){
+				datatosend = prompt("Data?");
+				document.body.innerHTML += "<br>"+peer.id+" > "+datatosend;
+				conn.send(datatosend);
+			}
+		</script>
+	</head>
+	<H1>(C) Ragul Balaji 2014</H1>
+	<input type="button" onClick="connect();" value="Connect" />
+	<input type="button" onClick="send();"  value="Send Stuff" />
+</html>

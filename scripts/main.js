@@ -17,7 +17,7 @@ var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
 var keys = new Array(255),oldKeys = new Array(255);
 var resetDelayInMs = 50;
 gamerCheckIn();
-var splashes = ["A Ball Game with Physics",gamerdata.userid+" has "+gamerdata.wins+" wins & "+gamerdata.losses+" losses","PONG IS BACK!","I was bored, so I made this.","Ping Pong Anyone?","Let's Dance","As seen on TV!","100% pure!","Made by Ragul","Singleplayer!","Multiplayer!","Haha, Lol","Hand Hurts","I Should Sleep.","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
+var splashes = ["A Ball Game with Physics",gamerdata.userid+" has "+gamerdata.wins+" wins & "+gamerdata.losses+" losses","PONG IS BACK!","I was bored, so I made this.","Ping Pong"+gamerdata.userid+"?","Let's Dance","As seen on TV!","100% pure!","Hello, "+gamerdata.userid+"!","Made by Ragul","Singleplayer!","Multiplayer!","Haha, Lol","Hand Hurts","I Should Sleep.","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
 var peer = new Peer(gamerdata.userid, {key: 'nkp6d8culreh4cxr'}); 
 
 function gotoState(id){

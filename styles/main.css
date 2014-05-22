@@ -24,6 +24,9 @@ body {
 h1{ font-size:30vh; }
 h2{ font-size:10vh; }
 h5{ font-size:5vh; }
+a{
+ color:silver;
+}
 .pongBall{
    position:absolute;
    height:2vh;
@@ -64,11 +67,13 @@ h5{ font-size:5vh; }
    -webkit-animation:splashtaganim 2s infinite linear;
 }
 .menuBtn {
+	text-align: center;
+	padding:0 0 0 0;
    height:8vh;
    width:50vw;
-   font-size:7vh;
+   font-size:6.5vh;
    padding: 0.5vh 15px;
-   background: #080817;
+   background: #0D1926;
    color: #FFF;
    -webkit-border-radius: 4px;
    -moz-border-radius: 4px;
@@ -95,3 +100,36 @@ h5{ font-size:5vh; }
    background: #C2DCEB;
    border: solid 2px #C2DCEB;
 }
+textBox:-webkit-input-placeholder { 
+    color:    #b5b5b5; 
+} 
+textBox-moz-placeholder { 
+    color:    #b5b5b5; 
+} 
+.textBox  { 
+	width:50vw; 
+	height:8vh;
+	padding: 2vh 0vw; 
+	text-align: center;
+	font-family: 'Electrolize', sans-serif;
+	font-size: 6.5vh; 
+	color: #E2E0F5; 
+	background: #000; 
+	border: 2px solid #FFF; 
+	border-radius: 5px; 
+	box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50); 
+	-moz-box-shadow: inset 0 1px 3px rgba(0,0,0,0.50); 
+	-webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50); 
+} 
+.textBox:focus { 
+	background: #0A0B1F; 
+	color: #E2E0F5; 
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25); 
+	-moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.25); 
+	-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25); 
+	outline:0; 
+} 
+.textBox:hover   { 
+	background: #0E1E2A; 
+	color: #E2E0F5; 
+} 

@@ -64,6 +64,7 @@ h5{ font-size:5vh; }
    -webkit-animation:splashtaganim 2s infinite linear;
 }
 .menuBtn {
+	padding:0 0 0 0;
    height:8vh;
    width:50vw;
    font-size:7vh;

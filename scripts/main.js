@@ -10,10 +10,11 @@ var leftScoreEle = document.getElementById("leftScore"), rightScoreEle = documen
 var gameLoopVar, gameRunning;
 var Ball, leftBat, rightBat;
 var leftScore, rightScore;
-var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.5;
+var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.5, ballTerminalVelocity = Math.sqrt(2);
 var CurrentState = 0, State = {MainMenu:1, Game:2};
 var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
 var keys = new Array(255),oldKeys = new Array(255);
+var resetDelayInMs = 50;
 var splashes = ["A Ball Game with Physics","PONG IS BACK!","I was bored, so I made this.","Ping Pong Anyone?","Let's Dance","As seen on TV!","100% pure!","Made by Ragul","Singleplayer!","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
 
 function gotoState(id){
@@ -91,11 +92,17 @@ function gameLoop(){
    //updates
    if(Ball.x <= XMin){ // LEFTHIT
       PointScoredSnd.play();
+      delay(resetDelayInMs);
+      getDelta();
       resetBall(1);
+      getDelta();
       rightScore++;
    }else if(Ball.x >= XMax){ //RIGHTHIT
       PointScoredSnd.play();
+      delay(resetDelayInMs);
+      getDelta();
       resetBall(-1);
+      getDelta();
       leftScore++;
    }
    if(Ball.y >= YMax ||  Ball.y <= YMin){
@@ -185,7 +192,12 @@ function getDelta() {
 function randInt(min, max) {
    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
+function delay(millis){
+	var date = Date.now();
+	var curDate = null;
+	do { curDate = Date.now(); } 
+	while(curDate-date < millis);
+} 
 window.onkeydown = function (e) {
    keys[e.keyCode] = true;
    oldKeys[e.keyCode] = false;

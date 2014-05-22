@@ -1,17 +1,21 @@
 <html>
 	<head>
+		<title>CURL</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link href='http://fonts.googleapis.com/css?family=Electrolize' rel='stylesheet' type='text/css'>
 		<link href='styles/main.css' rel='stylesheet' type='text/css'>
 	</head>
 	<body>
 		<div id="mainMenu" style="position:fixed; left:0vw; width:100vw;">
-			<center>
+		<center>
 				<h1 style="top:0%;margin-top:5vh; margin-bottom:0vh;">CURL</h1>
 				<h5 id="splash" class="splashtag" style="top:0%;margin-top:-6vh; margin-bottom:10vh;">A Ball Game with Physics</h5>
-				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); startGame();">START</div>
-				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); alert('Work In Progress');">SETTINGS</div>
-				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); alert('(C) RAGUL BALAJI & CONTRIBUTORS');">CREDITS</div>
+				<div class="menuBtn" id="singleBtn" style="padding:0;" onClick="btnPressSnd.play(); startGame();">SINGLEPLAYER</div>
+				<div class="menuBtn" id="multiBtn" style="padding:0;"  onClick="btnPressSnd.play(); alert('Experimental');">MULTIPLAYER</div>
+				<div style="margin:0; padding:0; width:50vw; height:8vh;">
+					<div class="menuBtn" id="settingsBtn" style="padding:0;display:inline; width:24vw; float:left;" onClick="btnPressSnd.play(); alert('Work In Progress');">SETTINGS</div>
+					<div class="menuBtn" id="creditsBtn" style="padding:0;display:inline; width:24vw; float:right;" onClick="btnPressSnd.play(); alert('(C) RAGUL BALAJI & CONTRIBUTORS');">CREDITS</div>
+				</div>
 			</center>
 		</div>
 		<div id="gameState" style="position:fixed; left:0; top:0;">

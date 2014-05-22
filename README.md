@@ -8,7 +8,6 @@ Released Under the MIT Open Source License. A short, permissive software license
 16 May'14 :
 - Felt like making a game on my way home.
 - MULTIPLAYER MUST COME SOMETIME SOON
-===
 - Created Main Page
 - Javascript created
 - Cascading Style Sheet created
@@ -29,5 +28,8 @@ Released Under the MIT Open Source License. A short, permissive software license
 19 May'14 :
 - Hey there GitHub :D
 - GitHub *Curl* Repository Created.
-===
 - MOVING ALL ASSETS TO GITHUB ASAP.
+
+21 May'14 :
+- PEER 2 PEER Communications test
+-  

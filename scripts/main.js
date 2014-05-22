@@ -257,6 +257,7 @@ function gamerCheckIn(){
 	}else{
 		gamerdata = JSON.parse(gamerdata);
 	}
+	document.title += " :: " +gamerdata.userid;
 	console.log("Loaded GamerData from localStorage >>",gamerdata);
 }
 window.onkeydown = function (e) {

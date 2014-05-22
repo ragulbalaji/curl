@@ -10,11 +10,11 @@
 		<center>
 				<h1 style="top:0%;margin-top:5vh; margin-bottom:0vh;">CURL</h1>
 				<h5 id="splash" class="splashtag" style="top:0%;margin-top:-6vh; margin-bottom:10vh;">A Ball Game with Physics</h5>
-				<div class="menuBtn" id="singleBtn" style="padding:0;" onClick="btnPressSnd.play(); startGame();">SINGLEPLAYER</div>
-				<div class="menuBtn" id="multiBtn" style="padding:0;"  onClick="btnPressSnd.play(); alert('Experimental');">MULTIPLAYER</div>
+				<div class="menuBtn" id="singleBtn" style="padding:0;" onClick="btnPressSnd.play(); startGame();">SinglePlayer</div>
+				<div class="menuBtn" id="multiBtn" style="padding:0;"  onClick="btnPressSnd.play(); alert('Experimental');">MultiPlayer</div>
 				<div style="margin:0; padding:0; width:50vw; height:8vh;">
-					<div class="menuBtn" id="settingsBtn" style="padding:0;display:inline; width:24vw; float:left;" onClick="btnPressSnd.play(); alert('Work In Progress');">SETTINGS</div>
-					<div class="menuBtn" id="creditsBtn" style="padding:0;display:inline; width:24vw; float:right;" onClick="btnPressSnd.play(); gotoState(State.Credits);">CREDITS</div>
+					<div class="menuBtn" id="settingsBtn" style="padding:0;display:inline; width:24vw; float:left;" onClick="btnPressSnd.play(); gotoState(State.Settings);">Options...</div>
+					<div class="menuBtn" id="creditsBtn" style="padding:0;display:inline; width:24vw; float:right;" onClick="btnPressSnd.play(); gotoState(State.Credits);">Credits</div>
 				</div>
 			</center>
 		</div>
@@ -33,19 +33,30 @@
 				<div id="wallBottom" class="pongWall" style="top:97vh;"></div>
 		</div>
 		<div id="creditState" style="position:fixed; left:0; top:0;">
-				<center>
-				<div class="menuBtn" id="settingsBtn" style="position:absolute; padding:0; display:inline; width:20vw; float:left; margin-top:2vh; margin-left:2vh;" onClick="btnPressSnd.play(); gotoState(State.MainMenu);">Back</div>
-				</center>
-				<div id="topbar" style="position:fixed; width:100vw; left:0vw; top:10vh;">
+				<div id="topbar" style="position:fixed; width:100vw; left:0vw; top:5vh;">
 					<center>
-						<h1 style="float:center; display: inline-block; margin-top:-2vh;">CURL</h1>
+						<h1 style="float:center; display: inline-block; margin-top:0vh;">CURL</h1>
 					</center>
-					<center style="margin-top:-30vh;">
-						<h5>Boredom drove me to make this.<br><br>Mostly Pure HTML5<br>Game Sounds By <a href="http://www.bfxr.net/">Bfxr</a><br><a href="https://www.google.com/fonts/specimen/Electrolize">Electrolize</a> font.<br>Made by <a href="http://ragulbalaji.tumblr.com/">Ragul Balaji</a> in 2014</h5>
+					<center style="margin-top:-35vh;">
+						<h5>Boredom drove me to make this.<br><br>Mostly Pure HTML5<br>Sounds Made with <a href="http://www.bfxr.net/">Bfxr</a><br><a href="https://www.google.com/fonts/specimen/Electrolize">Electrolize</a> font.<br>Made by <a href="http://ragulbalaji.tumblr.com/">Ragul Balaji</a> in 2014</h5>
+						<div class="menuBtn" id="DoneBtn" style="position:absolute; padding:0; display:inline; width:50vw; margin-left:-25vw;" onClick="btnPressSnd.play(); gotoState(State.MainMenu);">Done</div>
+					</center>
+				</div>
+		</div>
+		<div id="settingsState" style="position:fixed; left:0; top:0;">
+				<div id="topbar" style="position:fixed; width:100vw; left:0vw; top:5vh;">
+					<center>
+						<h2 style="float:center; display: inline-block; margin-top:0vh;">Options</h2>
+					</center>
+					<center style="margin-top:0vh;">
+						<input type="text" id="useridbox" class="textBox" placeholder="UserName" /> <br>
+						<div class="menuBtn" id="ResetStatsBtn" style="position:absolute; padding:0; color:RED; display:inline; width:50vw; margin-top:20vh; margin-left:-25vw;" onClick="btnPressSnd.play(); resetStats();">RESET STATISTICS!</div>
+						<div class="menuBtn" id="DoneBtn" style="position:absolute; padding:0; display:inline; width:50vw; margin-top:30vh; margin-left:-25vw;" onClick="btnPressSnd.play(); saveOptions(); gotoState(State.MainMenu);">Done</div>
 					</center>
 				</div>
 		</div>
 	</body>
 	<script src="scripts/seedrandom.min.js"></script>
+	<script src="scripts/peer.min.js"></script>
 	<script src="scripts/main.js"></script>
 </html>

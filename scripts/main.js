@@ -1,12 +1,12 @@
 var WIDTH = window.innerWidth,HEIGHT = window.innerHeight, delta;
-var gamerdata;
+var gamerdata, WIN = 1, LOSE = 0;
 var lastFrame,delta,time,fps = 0,tempfps,lastFPS = getTime();
 var btnPressSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BtnPress.mp3");
 var ballHitWallSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitWall.mp3");
 var ballHitBatSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitBat.mp3");
 var PointScoredSnd = new Audio("http://ragulbalaji.github.io/curl/audio/PointScored.mp3");
 var leftBatElement = document.getElementById("leftBat"),rightBatElement = document.getElementById("rightBat"),BallElement = document.getElementById("Ball");
-var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState"),creditState = document.getElementById("creditState");
+var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState"),creditState = document.getElementById("creditState"),settingsState = document.getElementById("settingsState");
 var leftScoreEle = document.getElementById("leftScore"), rightScoreEle = document.getElementById("rightScore");
 var gameLoopVar, gameRunning;
 var Ball, leftBat, rightBat;
@@ -16,21 +16,31 @@ var CurrentState = 0, State = {MainMenu:1, Game:2, Multiplayer:3, Settings:4, Cr
 var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
 var keys = new Array(255),oldKeys = new Array(255);
 var resetDelayInMs = 50;
-var splashes = ["A Ball Game with Physics","PONG IS BACK!","I was bored, so I made this.","Ping Pong Anyone?","Let's Dance","As seen on TV!","100% pure!","Made by Ragul","Singleplayer!","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
+gamerCheckIn();
+var splashes = ["A Ball Game with Physics",gamerdata.userid+" has "+gamerdata.wins+" wins & "+gamerdata.losses+" losses","PONG IS BACK!","I was bored, so I made this.","Ping Pong Anyone?","Let's Dance","As seen on TV!","100% pure!","Made by Ragul","Singleplayer!","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
 
 function gotoState(id){
    if(id == State.MainMenu){
       mainMenu.style.display="block";
       gameState.style.display="none";
+      settingsState.style.display="none";
       creditState.style.display="none";
       document.getElementById("splash").innerHTML = splashes[randInt(0,splashes.length-1)];
    }else if(id == State.Game){
       mainMenu.style.display="none";
       gameState.style.display="block";
+      settingsState.style.display="none";
       creditState.style.display="none";
+   }else if(id == State.Settings){
+   	mainMenu.style.display="none";
+      gameState.style.display="none";
+      settingsState.style.display="block";
+      creditState.style.display="none";
+      document.getElementById("useridbox").value = gamerdata.userid;
    }else if(id == State.Credits){
    	mainMenu.style.display="none";
       gameState.style.display="none";
+      settingsState.style.display="none";
       creditState.style.display="block";
    }
 }
@@ -103,6 +113,7 @@ function gameLoop(){
       getDelta();
       resetBall(1);
       getDelta();
+      updateStats(LOSE);
       rightScore++;
    }else if(Ball.x >= XMax){ //RIGHTHIT
       PointScoredSnd.play();
@@ -110,6 +121,7 @@ function gameLoop(){
       getDelta();
       resetBall(-1);
       getDelta();
+      updateStats(WIN);
       leftScore++;
    }
    if(Ball.y >= YMax ||  Ball.y <= YMin){
@@ -169,6 +181,11 @@ function gameRender(){
    leftScoreEle.innerHTML = leftScore;
    rightScoreEle.innerHTML = rightScore;
 }
+function saveOptions(){
+	if(document.getElementById("useridbox").value != "") gamerdata.userid = document.getElementById("useridbox").value;
+	localStorage.setItem("GamerData", JSON.stringify(gamerdata));
+	console.log("Updated GamerData to localStorage >>",gamerdata);
+}
 function gameObj(px,py, pvx, pvy){
    this.x = px;
    this.y = py;
@@ -180,6 +197,21 @@ function resetBall(direction){
    Ball.y = 11*HEIGHT/20;
    Ball.vx = (randInt(3,8)/(10*direction));
    Ball.vy = Math.random()-0.5;
+}
+function updateStats(stat){
+	if(stat == WIN){
+		gamerdata.wins++;
+	}else if(stat == LOSE){
+		gamerdata.losses++;
+	}
+	console.log("User Statistics Updated :)");
+	localStorage.setItem("GamerData", JSON.stringify(gamerdata));
+}
+function resetStats(){
+	gamerdata.wins = 0;
+	gamerdata.losses = 0;
+	console.log("User Statistics Reset! YAY NEW BEGINNING");
+	localStorage.setItem("GamerData", JSON.stringify(gamerdata));
 }
 function getTime() {return Date.now();}
 function updateFPS() {
@@ -206,11 +238,15 @@ function delay(millis){
 	while(curDate-date < millis);
 } 
 function gamerCheckIn(){
-	gamerdata = localStorage.getItem("gamer");
+	gamerdata = localStorage.getItem("GamerData");
 	if(gamerdata == null){
-		gamerdata.userid = "Player";
+		gamerdata = {userid:prompt("It seems you haven't got a UserName, give me one now?"),wins:0, losses:0};
+		localStorage.setItem("GamerData", JSON.stringify(gamerdata));
+		console.log("Created GamerData on localStorage >>",gamerdata);
+	}else{
+		gamerdata = JSON.parse(gamerdata);
 	}
-	console.log(gamerdata);
+	console.log("Loaded GamerData from localStorage >>",gamerdata);
 }
 window.onkeydown = function (e) {
    keys[e.keyCode] = true;
@@ -231,7 +267,6 @@ window.addEventListener('touchmove', function(e) {
 }, false);
 
 function main(){
-	//gamerCheckIn();
    //Math.seedrandom(2000);
    gotoState(State.MainMenu);
    //startGame();

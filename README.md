@@ -31,5 +31,20 @@ Released Under the MIT Open Source License. A short, permissive software license
 - MOVING ALL ASSETS TO GITHUB ASAP.
 
 21 May'14 :
-- PEER 2 PEER Communications test
--  
+- PEER 2 PEER Communications test using Peer.js
+- Increased Bat Speed
+- Unified resetBall().
+- CSS & tabWidth Cleanup
+- seedrandom.min.js by @davidbau forked! :D
+- Javascript Organised.
+- No more of strike's
+- Splashes & Other stuff
+
+22 May'14 :
+- Menu & A Bunch of other Update
+- Credits Are done I guess
+- <strike>back</strike> Done buttons
+- Added GamerData Functionality & Options Menu.
+- More Splashes
+- favicons & iOS customisations are here :D
+- User Title Logs for GA

@@ -14,7 +14,7 @@
 				<div class="menuBtn" id="multiBtn" style="padding:0;"  onClick="btnPressSnd.play(); alert('Experimental');">MULTIPLAYER</div>
 				<div style="margin:0; padding:0; width:50vw; height:8vh;">
 					<div class="menuBtn" id="settingsBtn" style="padding:0;display:inline; width:24vw; float:left;" onClick="btnPressSnd.play(); alert('Work In Progress');">SETTINGS</div>
-					<div class="menuBtn" id="creditsBtn" style="padding:0;display:inline; width:24vw; float:right;" onClick="btnPressSnd.play(); alert('(C) RAGUL BALAJI & CONTRIBUTORS');">CREDITS</div>
+					<div class="menuBtn" id="creditsBtn" style="padding:0;display:inline; width:24vw; float:right;" onClick="btnPressSnd.play(); gotoState(State.Credits);">CREDITS</div>
 				</div>
 			</center>
 		</div>
@@ -31,6 +31,16 @@
 				<div id="Ball" class="pongBall"></div>
 				<div id="rightBat" class="pongBat" style="float:right;"></div>
 				<div id="wallBottom" class="pongWall" style="top:97vh;"></div>
+		</div>
+		<div id="creditState" style="position:fixed; left:0; top:0;">
+				<div id="topbar" style="position:fixed; width:100vw; left:0vw; top:10vh;">
+					<center>
+						<h1 style="float:center; display: inline-block; margin-top:-2vh;">CURL</h1>
+					</center>
+					<center style="margin-top:-30vh;">
+						<h5>Boredom drove me to make this.<br><br>Mostly Pure HTML5<br>Game Sounds By <a href="http://www.bfxr.net/">Bfxr</a><br><a href="https://www.google.com/fonts/specimen/Electrolize">Electrolize</a> font.<br>Made by <a href="http://ragulbalaji.tumblr.com/">Ragul Balaji</a> in 2014</h5>
+					</center>
+				</div>
 		</div>
 	</body>
 	<script src="scripts/seedrandom.min.js"></script>

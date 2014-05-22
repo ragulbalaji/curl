@@ -1,4 +1,5 @@
 var WIDTH = window.innerWidth,HEIGHT = window.innerHeight, delta;
+var gamerdata;
 var lastFrame,delta,time,fps = 0,tempfps,lastFPS = getTime();
 var btnPressSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BtnPress.mp3");
 var ballHitWallSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitWall.mp3");
@@ -204,6 +205,13 @@ function delay(millis){
 	do { curDate = Date.now(); } 
 	while(curDate-date < millis);
 } 
+function gamerCheckIn(){
+	gamerdata = localStorage.getItem("gamer");
+	if(gamerdata == null){
+		gamerdata.userid = "Player";
+	}
+	console.log(gamerdata);
+}
 window.onkeydown = function (e) {
    keys[e.keyCode] = true;
    oldKeys[e.keyCode] = false;
@@ -223,6 +231,7 @@ window.addEventListener('touchmove', function(e) {
 }, false);
 
 function main(){
+	//gamerCheckIn();
    //Math.seedrandom(2000);
    gotoState(State.MainMenu);
    //startGame();

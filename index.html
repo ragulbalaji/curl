@@ -1,5 +1,6 @@
 <html>
 	<head>
+            
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link href='http://fonts.googleapis.com/css?family=Electrolize' rel='stylesheet' type='text/css'>
 		<link href='styles/main.css' rel='stylesheet' type='text/css'>
@@ -12,6 +13,7 @@
 				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); startGame();">START</div>
 				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); alert('Work In Progress');">SETTINGS</div>
 				<div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); alert('(C) RAGUL BALAJI & CONTRIBUTORS');">CREDITS</div>
+                                <div class="menuBtn" id="startBtn" onClick="btnPressSnd.play(); multiplayer();">MULTIPLAYER</div>
 			</center>
 		</div>
 		<div id="gameState" style="position:fixed; left:0; top:0;">
@@ -28,7 +30,15 @@
 				<div id="rightBat" class="pongBat" style="float:right;"></div>
 				<div id="wallBottom" class="pongWall" style="top:97vh;"></div>
 		</div>
+            <div id="browser" style ="position: fixed; left:0; top:0;">
+                
+                <center>
+                 <h1>SERVER</h1>
+                 <h2 id="connect" style ="alignment-baseline: middle;">NOT CONNECTED TO SERVER</h2>
+                </center>
+            </div>
 	</body>
 	<script src="scripts/seedrandom.min.js"></script>
-	<script src="scripts/main.js"></script>
+            <script src="scripts/main.js"></script>
+            <script src="scripts/jquery-1.11.0.min.js"></script>
 </html>

@@ -6,25 +6,20 @@ var ballHitWallSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitW
 var ballHitBatSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitBat.mp3");
 var PointScoredSnd = new Audio("http://ragulbalaji.github.io/curl/audio/PointScored.mp3");
 var leftBatElement = document.getElementById("leftBat"),rightBatElement = document.getElementById("rightBat"),BallElement = document.getElementById("Ball");
-<<<<<<< HEAD
 var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState"),browser=document.getElementById("browser");
-=======
 var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState"), multiplayerState = document.getElementById("multiplayerState"),creditState = document.getElementById("creditState"),settingsState = document.getElementById("settingsState");
->>>>>>> FETCH_HEAD
 var leftScoreEle = document.getElementById("leftScore"), rightScoreEle = document.getElementById("rightScore");
 var gameLoopVar, gameRunning;
 var Ball, leftBat, rightBat;
 var leftScore, rightScore;
-<<<<<<< HEAD
 var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.5;
 var CurrentState = 0, State = {MainMenu:1, Game:2, Server:3};
 var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
 var keys = new Array(255),oldKeys = new Array(255);
 var splashes = ["A Ball Game with Physics","PONG IS BACK!","I was bored, so I made this.","Ping Pong Anyone?","Let's Dance","As seen on TV!","100% pure!","Made by Ragul","Singleplayer!","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
 var address = "http://67.188.127.115:8080/CurlServer/connect";
-=======
 var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.5, ballTerminalVelocity = Math.sqrt(2);
-var CurrentState = 0, State = {MainMenu:1, Game:2, Multiplayer:3, Settings:4, Credits:5,};
+var CurrentState = 0, State = {MainMenu:1, Game:2, Server:3, Multiplayer:4, Settings:5, Credits:6};
 var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
 var keys = new Array(255),oldKeys = new Array(255);
 var resetDelayInMs = 50;
@@ -32,30 +27,24 @@ gamerCheckIn();
 var splashes = ["A Ball Game with Physics",gamerdata.userid+" has "+gamerdata.wins+" wins & "+gamerdata.losses+" losses","PONG IS BACK!","I was bored, so I made this.","Ping Pong "+gamerdata.userid+"?","Let's Dance","As seen on TV!","100% pure!","Hello, "+gamerdata.userid+"!","Made by Ragul","Singleplayer!","Multiplayer!","Haha, Lol","Hand Hurts","I Should Sleep.","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
 var peer = new Peer(gamerdata.userid, {key: 'nkp6d8culreh4cxr'}); 
 
->>>>>>> FETCH_HEAD
 function gotoState(id){
    if(id == State.MainMenu){
       mainMenu.style.display="block";
       gameState.style.display="none";
-<<<<<<< HEAD
       browser.style.display="none";
-=======
       multiplayerState.style.display="none";
       settingsState.style.display="none";
       creditState.style.display="none";
->>>>>>> FETCH_HEAD
       document.getElementById("splash").innerHTML = splashes[randInt(0,splashes.length-1)];
    }else if(id == State.Game){
       mainMenu.style.display="none";
       gameState.style.display="block";
-<<<<<<< HEAD
       browser.style.display="none";
    }
    else if(id == State.Server){
        gameState.style.display="none";
        mainMenu.style.display="none";
        browser.style.display="block";
-=======
       multiplayerState.style.display="none";
       settingsState.style.display="none";
       creditState.style.display="none";
@@ -78,7 +67,6 @@ function gotoState(id){
       multiplayerState.style.display="none";
       settingsState.style.display="none";
       creditState.style.display="block";
->>>>>>> FETCH_HEAD
    }
 }
 

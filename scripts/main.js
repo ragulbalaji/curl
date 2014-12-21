@@ -17,7 +17,7 @@ var CurrentState = 0, State = {MainMenu:1, Game:2, Server:3};
 var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
 var keys = new Array(255),oldKeys = new Array(255);
 var splashes = ["A Ball Game with Physics","PONG IS BACK!","I was bored, so I made this.","Ping Pong Anyone?","Let's Dance","As seen on TV!","100% pure!","Made by Ragul","Singleplayer!","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
-var address = "http://67.188.127.115:8080/CurlServer/connect";
+var address = "connect";
 var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.5, ballTerminalVelocity = Math.sqrt(2);
 var CurrentState = 0, State = {MainMenu:1, Game:2, Server:3, Multiplayer:4, Settings:5, Credits:6};
 var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;

@@ -1,30 +1,35 @@
-var WIDTH = window.innerWidth,HEIGHT = window.innerHeight, delta;
+var WIDTH = window.innerWidth, HEIGHT = window.innerHeight, delta;
 var gamerdata, WIN = 1, LOSE = 0;
-var lastFrame,delta,time,fps = 0,tempfps,lastFPS = getTime();
+var lastFrame, delta, time, fps = 0, tempfps, lastFPS = getTime();
 var btnPressSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BtnPress.mp3");
 var ballHitWallSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitWall.mp3");
 var ballHitBatSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitBat.mp3");
 var PointScoredSnd = new Audio("http://ragulbalaji.github.io/curl/audio/PointScored.mp3");
-var leftBatElement = document.getElementById("leftBat"),rightBatElement = document.getElementById("rightBat"),BallElement = document.getElementById("Ball");
-var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState"), multiplayerState = document.getElementById("multiplayerState"),creditState = document.getElementById("creditState"),settingsState = document.getElementById("settingsState");
+var leftBatElement = document.getElementById("leftBat"), rightBatElement = document.getElementById("rightBat"), BallElement = document.getElementById("Ball");
+var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState"), multiplayerState = document.getElementById("multiplayerState"), creditState = document.getElementById("creditState"), settingsState = document.getElementById("settingsState");
 var leftScoreEle = document.getElementById("leftScore"), rightScoreEle = document.getElementById("rightScore");
+var debugspin = document.getElementById("ballspin");
 var gameLoopVar, gameRunning;
+var batClampVelocity = 0.6;
 var Ball, leftBat, rightBat;
 var leftScore, rightScore;
-var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.5, ballTerminalVelocity = Math.sqrt(2);
-var CurrentState = 0, State = {MainMenu:1, Game:2, Multiplayer:3, Settings:4, Credits:5,};
-var XMin = 0, XMax = WIDTH, YMin = 0.17*HEIGHT, YMax = 0.95*HEIGHT;
-var keys = new Array(255),oldKeys = new Array(255);
+var ballrotation=0;
+var batAcceleration = 0.1;
+var batWallCoefficient=0.03;
+var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.3, batSpinFriction=0.7, ballTerminalVelocity = Math.SQRT2;
+var CurrentState = 0, State = {MainMenu: 1, Game: 2, Multiplayer: 3, Settings:4, Credits:5};
+var XMin = 0, XMax = WIDTH, YMin = 0.17 * HEIGHT, YMax = 0.95 * HEIGHT;
+var keys = new Array(255), oldKeys = new Array(255);
 var resetDelayInMs = 50;
+var ballRotationalInertia = 0.02;
 gamerCheckIn();
-var splashes = ["A Ball Game with Physics",gamerdata.userid+" has "+gamerdata.wins+" wins & "+gamerdata.losses+" losses","PONG IS BACK!","I was bored, so I made this.","Ping Pong "+gamerdata.userid+"?","Let's Dance","As seen on TV!","100% pure!","Hello, "+gamerdata.userid+"!","Made by Ragul","Singleplayer!","Multiplayer!","Haha, Lol","Hand Hurts","I Should Sleep.","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
+var splashes = ["A Ball Game with Physics", gamerdata.userid + " has " + gamerdata.wins + " wins & " + gamerdata.losses + " losses", "PONG IS BACK!", "I was bored, so I made this.", "Ping Pong " + gamerdata.userid + "?", "Let's Dance", "As seen on TV!", "100% pure!", "Hello, " +gamerdata.userid +"!","Made by Ragul","Singleplayer!","Multiplayer!","Haha, Lol","Hand Hurts","I Should Sleep.","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
 var peer = new Peer(gamerdata.userid, {key: 'nkp6d8culreh4cxr'}); 
-
 function gotoState(id){
    if(id == State.MainMenu){
       mainMenu.style.display="block";
-      gameState.style.display="none";
-      multiplayerState.style.display="none";
+      gameState.style.display= "none";
+       multiplayerState.style.display="none";
       settingsState.style.display="none";
       creditState.style.display="none";
       document.getElementById("splash").innerHTML = splashes[randInt(0,splashes.length-1)];
@@ -85,11 +90,24 @@ function startGame(){
    gameLoopVar = setInterval(gameLoop,0);
 }
 function input(){
+    if(leftBat.vy<0)
+    {
+        leftBat.vy+=0.01*delta;
+    }
+    else if(leftBat.vy>0)
+    {
+        leftBat.vy-=0.01*delta;
+    }
+    if(Math.abs(leftBat.vy-0)<0.02)
+    {
+        leftBat.vy=0;
+    }
    if(keys[87] || keys[38]){
-      leftBat.vy = -batMoveVelocity;
+      leftBat.vy += -2*batAcceleration*delta;
    }else if(keys[83] || keys[40]){
-      leftBat.vy = batMoveVelocity;
-   }else if(keys[27]){ //Esc
+      leftBat.vy += 2*batAcceleration*delta;
+   }
+    if(keys[27]){ //Esc
       gameLoopVar = clearInterval(gameLoopVar);
       gotoState(State.MainMenu);
    }else if(keys[80] && !oldKeys[80]){ //Pause-P
@@ -101,8 +119,6 @@ function input(){
          getDelta();
          gameLoopVar = setInterval(gameLoop,0);
       }
-   }else{
-      leftBat.vy = 0;
    }
 }
 function touch(x, y, action) {
@@ -115,10 +131,57 @@ function touch(x, y, action) {
       }
    }
 }
-function gameLoop(){
-   getDelta();
-   //updates
-   if(Ball.x <= XMin){ // LEFTHIT
+var yhit;
+var angle=0;
+function ballpath(){
+    angle = Math.atan2(Ball.vy,Ball.vx);
+    var angletonearestedge;
+    if(Ball.vy>0)
+    {
+        angletonearestedge= Math.atan2((HEIGHT-Ball.y),WIDTH);
+    }
+    else if(Ball.vy<0)
+    {
+        angletonearestedge= Math.atan2(-Ball.y,WIDTH);
+    }
+    if(Math.abs(angle)<Math.abs(angletonearestedge))
+    {
+        //linear assignment
+        yhit = Math.tan(angle)*WIDTH+Ball.y;
+    }
+    else{
+        var period = angle;
+        var phase = Ball.y*(Ball.vy,Math.abs(Ball.vy));
+        yhit = HEIGHT*Math.sin((2*Math.PI/period)*WIDTH);
+        yhit=0
+    }
+    
+}
+function ai(){
+    //if we visualise the ball and the couse as a sine wave, we can use that to calculate the ball's end position and be there
+    if(yhit==0){
+        if(Ball.y > rightBat.y+(HEIGHT*9/100)){
+        rightBat.vy = batMoveVelocity;
+    }else if(Ball.y < rightBat.y+(HEIGHT*9/100)){
+        rightBat.vy = -batMoveVelocity;
+    }else{
+        rightBat.vy = 0;
+    }
+    }
+    else{
+        if(rightBat.y>yhit)
+        {
+           rightBat.vy = -batMoveVelocity;
+        }
+        else if(rightBat.y<yhit)
+        {
+            rightBat.vy = batMoveVelocity;
+        }
+    }
+}
+
+function score(){
+    if(Ball.x <= XMin){ // LEFTHIT
       PointScoredSnd.play();
       delay(resetDelayInMs);
       getDelta();
@@ -135,35 +198,60 @@ function gameLoop(){
       updateStats(WIN);
       leftScore++;
    }
+}
+function gameLoop(){
+   getDelta();
+    input();
+   //updates
+   score();
+    var impult;
+    var mangle = Math.atan(Ball.vy/Ball.vx);
    if(Ball.y >= YMax ||  Ball.y <= YMin){
+       if(Ball.y >= YMax)
+            var relativespeed = Ball.vx+ballrotation*2;
+       else if(Ball.y <= YMin)
+            var relativespeed = Ball.vx+ballrotation*2;
+        impult = Ball.vy+ballBounceEfficiency*Ball.vy;
       ballHitWallSnd.play();
-      Ball.vy = -ballBounceEfficiency *Ball.vy;
-      Ball.vx = ballBounceEfficiency *Ball.vx;
+      Ball.vy -= impult;
+       //ballrotation+=batWallCoefficient*relativespeed/2;
+       //Ball.vx+=batWallCoefficient*relativespeed;
       if(Ball.y >= YMax){
          Ball.y = YMax;
       }else{
          Ball.y = YMin;
       }
    }
-   if(Ball.y > rightBat.y+(HEIGHT*9/100)){
-      rightBat.vy = batMoveVelocity;
-   }else if(Ball.y < rightBat.y+(HEIGHT*9/100)){
-      rightBat.vy = -batMoveVelocity;
-   }else{
-      rightBat.vy = 0;
-   }
-   if(Ball.x+(HEIGHT*2/100) >= rightBat.x && Ball.x+(HEIGHT*2/100) <= rightBat.x+(HEIGHT*5/100) && Ball.y+(HEIGHT*1/100) >= rightBat.y && Ball.y+(HEIGHT*1/100) <= rightBat.y+(HEIGHT*20/100)){
+   ai();
+    var impulse;
+    var angle=Math.atan(Ball.vy/Ball.vx);
+   if(Ball.x+(HEIGHT*2/100) >= rightBat.x 
+      && Ball.x+(HEIGHT*2/100) <= rightBat.x+(HEIGHT*5/100) 
+      && Ball.y+(HEIGHT*1/100) >= rightBat.y 
+      && Ball.y+(HEIGHT*1/100) <= rightBat.y+(HEIGHT*20/100)){
+          ballHitBatSnd.play();
+          Ball.x=rightBat.x-2*HEIGHT/100;
+       var relativespeed = -Ball.vy+batSpinFriction*ballrotation*0.02+batBallFrictionCoeff*rightBat.vy;
+       impulse = Ball.vx+ballBounceEfficiency*Ball.vx;
+       var normal = impulse/delta;
+          Ball.vx-=impulse;
+       ballrotation -= relativespeed/0.02;
+        Ball.vy+=relativespeed;
+       document.getElementById("relativespeed").innerHTML=relativespeed;
+   }else if(Ball.x <= leftBat.x+(HEIGHT*5/100) 
+            && Ball.x >= leftBat.x
+            && Ball.y+(HEIGHT*1/100) >= leftBat.y 
+            && Ball.y+(HEIGHT*1/100) <= leftBat.y+(HEIGHT*20/100)){
       ballHitBatSnd.play();
-      Ball.x=rightBat.x-2*HEIGHT/100;
-      Ball.vx=-ballBounceEfficiency *Ball.vx;
-      Ball.vx += batBallFrictionCoeff*0.1*rightBat.vy;
-      Ball.vy += batBallFrictionCoeff*rightBat.vy;
-   }else if(Ball.x <= leftBat.x+(HEIGHT*5/100) && Ball.x >= leftBat.x && Ball.y+(HEIGHT*1/100) >= leftBat.y && Ball.y+(HEIGHT*1/100) <= leftBat.y+(HEIGHT*20/100)){
-      ballHitBatSnd.play();
+           ballpath();
       Ball.x=leftBat.x+7*HEIGHT/100;
-      Ball.vx=-ballBounceEfficiency *Ball.vx;
-      Ball.vx += batBallFrictionCoeff*0.1*leftBat.vy;
-      Ball.vy += batBallFrictionCoeff*leftBat.vy;
+       var relativespeed = -Ball.vy-batSpinFriction*ballrotation*0.02+batBallFrictionCoeff*leftBat.vy;
+      impulse = Ball.vx+ballBounceEfficiency*Ball.vx;
+       var normal = impulse/delta;
+          Ball.vx-=impulse;          
+       ballrotation += relativespeed/0.02;
+        Ball.vy+=relativespeed;
+        document.getElementById("relativespeed").innerHTML=relativespeed;
    }
    if(rightBat.y >= YMax-(HEIGHT*19/100)){
       rightBat.y = YMax-(HEIGHT*19/100);
@@ -171,16 +259,27 @@ function gameLoop(){
       rightBat.y = YMin+(HEIGHT/100);
    }
    if(leftBat.y >= YMax-(HEIGHT*19/100)){
-      leftBat.y = YMax-(HEIGHT*19/100);
-   }else if(leftBat.y <= YMin+(HEIGHT/100)){
+      leftBat.y = YMax-(HEIGHT*19/100+1);
+       leftBat.vy=-0.4;
+   }else if(leftBat.y <= YMin+(HEIGHT/100+1)){
       leftBat.y = YMin+(HEIGHT/100);
+       leftBat.vy=+0.4;
    }
+    if(leftBat.vy>batClampVelocity)
+    {
+        leftBat.vy=batClampVelocity;
+    }
+    else if(leftBat.vy<-batClampVelocity)
+    {
+        leftBat.vy=-batClampVelocity;
+    }
    leftBat.x += leftBat.vx*delta;
    leftBat.y += leftBat.vy*delta;
    rightBat.x += rightBat.vx*delta;
    rightBat.y += rightBat.vy*delta;
    Ball.x += Ball.vx*delta;
    Ball.y += Ball.vy*delta;
+    
    //
    gameRender();
    updateFPS();
@@ -191,6 +290,7 @@ function gameRender(){
    setObjToEle(rightBat, rightBatElement);
    leftScoreEle.innerHTML = leftScore;
    rightScoreEle.innerHTML = rightScore;
+    debugspin.innerHTML=ballrotation;
 }
 function saveOptions(){
 	if(document.getElementById("useridbox").value != "") gamerdata.userid = document.getElementById("useridbox").value;
@@ -208,6 +308,8 @@ function resetBall(direction){
    Ball.y = 11*HEIGHT/20;
    Ball.vx = (randInt(3,8)/(10*direction));
    Ball.vy = Math.random()-0.5;
+    ballrotation=0;
+    ballpath();
 }
 function updateStats(stat){
 	if(stat == WIN){
@@ -263,12 +365,10 @@ function gamerCheckIn(){
 window.onkeydown = function (e) {
    keys[e.keyCode] = true;
    oldKeys[e.keyCode] = false;
-   input();
 };
 window.onkeyup = function (e) {
    keys[e.keyCode] = false;
    oldKeys[e.keyCode] = true;
-   input();
 };
 window.addEventListener('touchstart', function(e) {
  touch(e.changedTouches[0].pageX, e.changedTouches[0].pageY, true);

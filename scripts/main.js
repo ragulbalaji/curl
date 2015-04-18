@@ -16,9 +16,10 @@ var leftScore, rightScore;
 var ballrotation=0;
 var batAcceleration = 0.1;
 var batWallCoefficient=0.03;
-var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.3, batSpinFriction=0.7, ballTerminalVelocity = Math.SQRT2;
+var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.3, batSpinFriction=0.3, ballTerminalVelocity = Math.SQRT2;
 var CurrentState = 0, State = {MainMenu: 1, Game: 2, Multiplayer: 3, Settings:4, Credits:5};
 var XMin = 0, XMax = WIDTH, YMin = 0.17 * HEIGHT, YMax = 0.95 * HEIGHT;
+var ballradius = WIDTH*1/100;
 var keys = new Array(255), oldKeys = new Array(255);
 var resetDelayInMs = 50;
 var ballRotationalInertia = 0.02;
@@ -231,12 +232,12 @@ function gameLoop(){
       && Ball.y+(HEIGHT*1/100) <= rightBat.y+(HEIGHT*20/100)){
           ballHitBatSnd.play();
           Ball.x=rightBat.x-2*HEIGHT/100;
-       var relativespeed = -Ball.vy+batSpinFriction*ballrotation*0.02+batBallFrictionCoeff*rightBat.vy;
+       var relativespeed = -Ball.vy+ballrotation*ballradius+rightBat.vy;
        impulse = Ball.vx+ballBounceEfficiency*Ball.vx;
        var normal = impulse/delta;
           Ball.vx-=impulse;
-       ballrotation -= relativespeed/0.02;
-        Ball.vy+=relativespeed;
+       ballrotation -= batSpinFriction*relativespeed/ballradius;
+        Ball.vy+=batBallFrictionCoeff*relativespeed;
        document.getElementById("relativespeed").innerHTML=relativespeed;
    }else if(Ball.x <= leftBat.x+(HEIGHT*5/100) 
             && Ball.x >= leftBat.x
@@ -245,12 +246,12 @@ function gameLoop(){
       ballHitBatSnd.play();
            ballpath();
       Ball.x=leftBat.x+7*HEIGHT/100;
-       var relativespeed = -Ball.vy-batSpinFriction*ballrotation*0.02+batBallFrictionCoeff*leftBat.vy;
+       var relativespeed = -Ball.vy-ballrotation*ballradius+leftBat.vy;
       impulse = Ball.vx+ballBounceEfficiency*Ball.vx;
        var normal = impulse/delta;
           Ball.vx-=impulse;          
-       ballrotation += relativespeed/0.02;
-        Ball.vy+=relativespeed;
+       ballrotation += batSpinFriction*relativespeed/ballradius;
+        Ball.vy+=batBallFrictionCoeff*relativespeed;
         document.getElementById("relativespeed").innerHTML=relativespeed;
    }
    if(rightBat.y >= YMax-(HEIGHT*19/100)){

@@ -43,7 +43,10 @@
 		<div id="multiplayerState" style="position:fixed; left:0; top:0;">
 				<div id="topbar" style="position:fixed; width:100vw; left:0vw; top:0vh;">
 					<center>
-						<h2 style="float:center; display: inline-block; margin-top:10vh;">MultiPlayer is Work in Progress<br><br>Press Esc. to return</h2>
+						<h2 style="float:center; display: inline-block; margin-top:10vh;">Select a Service</h2>
+                        <div class="menuBtn" id="serverBtn" onClick="btnPressSnd.play(); gotoState(State.Waiting);">Host</div>
+                        <div class="menuBtn" id="clientBtn" onClick="btnPressSnd.play(); connectToHost();">Join</div>
+                        <input type="text" />
 					</center>
 				</div>
 		</div>

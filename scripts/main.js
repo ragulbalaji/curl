@@ -6,8 +6,10 @@ var ballHitWallSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitW
 var ballHitBatSnd = new Audio("http://ragulbalaji.github.io/curl/audio/BallHitBat.mp3");
 var PointScoredSnd = new Audio("http://ragulbalaji.github.io/curl/audio/PointScored.mp3");
 var leftBatElement = document.getElementById("leftBat"), rightBatElement = document.getElementById("rightBat"), BallElement = document.getElementById("Ball");
-var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState"), multiplayerState = document.getElementById("multiplayerState"), creditState = document.getElementById("creditState"), settingsState = document.getElementById("settingsState");
+var mainMenu = document.getElementById("mainMenu"), gameState = document.getElementById("gameState"), multiplayerState = document.getElementById("multiplayerState"), creditState = document.getElementById("creditState"), settingsState = document.getElementById("settingsState"), connectState = document.getElementById("connectState"), waitingState=document.getElementById("waitingState");
 var leftScoreEle = document.getElementById("leftScore"), rightScoreEle = document.getElementById("rightScore");
+var connectionStatusText = document.getElementById("statusText");
+var connectionState;
 var debugspin = document.getElementById("ballspin");
 var gameLoopVar, gameRunning;
 var batClampVelocity = 0.6;
@@ -23,50 +25,98 @@ var ballradius = WIDTH*1/100;
 var keys = new Array(255), oldKeys = new Array(255);
 var resetDelayInMs = 50;
 var ballRotationalInertia = 0.02;
+var isMultiplayer = false;
+var isClient = false;
+var connection;
+var peerid = document.getElementById("peerid");
 gamerCheckIn();
 var splashes = ["A Ball Game with Physics", gamerdata.userid + " has " + gamerdata.wins + " wins & " + gamerdata.losses + " losses", "PONG IS BACK!", "I was bored, so I made this.", "Ping Pong " + gamerdata.userid + "?", "Let's Dance", "As seen on TV!", "100% pure!", "Hello, " +gamerdata.userid +"!","Made by Ragul","Singleplayer!","Multiplayer!","Haha, Lol","Hand Hurts","I Should Sleep.","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
-var peer = new Peer(gamerdata.userid, {key: 'nkp6d8culreh4cxr'}); 
-function gotoState(id){
+function gotoState(id) {
    if(id == State.MainMenu){
       mainMenu.style.display="block";
       gameState.style.display= "none";
        multiplayerState.style.display="none";
       settingsState.style.display="none";
-      creditState.style.display="none";
+      creditState.style.display = "none";
+      connectState.style.display = "none";
+      waitingState.style.display = "none";
       document.getElementById("splash").innerHTML = splashes[randInt(0,splashes.length-1)];
    }else if(id == State.Game){
       mainMenu.style.display="none";
       gameState.style.display="block";
       multiplayerState.style.display="none";
       settingsState.style.display="none";
-      creditState.style.display="none";
+      creditState.style.display = "none";
+      connectState.style.display = "none";
+      waitingState.style.display = "none";
    }else if(id == State.Multiplayer){
    	mainMenu.style.display="none";
       gameState.style.display="none";
       multiplayerState.style.display="block";
       settingsState.style.display="none";
-      creditState.style.display="none";
+      creditState.style.display = "none";
+      connectState.style.display = "none";
+      waitingState.style.display = "none";
    }else if(id == State.Settings){
    	mainMenu.style.display="none";
       gameState.style.display="none";
       multiplayerState.style.display="none";
       settingsState.style.display="block";
-      creditState.style.display="none";
+      creditState.style.display = "none";
+      connectState.style.display = "none";
+      waitingState.style.display = "none";
       document.getElementById("useridbox").value = gamerdata.userid;
    }else if(id == State.Credits){
    	mainMenu.style.display="none";
       gameState.style.display="none";
       multiplayerState.style.display="none";
       settingsState.style.display="none";
-      creditState.style.display="block";
+      creditState.style.display = "block";
+      connectState.style.display = "none";
+      waitingState.style.display = "none";
    }
+   else if (id == State.Waiting) {
+       mainMenu.style.display = "none";
+       gameState.style.display = "none";
+       multiplayerState.style.display = "none";
+       settingsState.style.display = "none";
+       creditState.style.display = "none";
+       connectState.style.display = "none";
+       waitingState.style.display = "block";
+       
+   }
+   else if (id == State.Connect) {
+       mainMenu.style.display = "none";
+       gameState.style.display = "none";
+       multiplayerState.style.display = "none";
+       settingsState.style.display = "none";
+       creditState.style.display = "none";
+       connectState.style.display = "block";
+       waitingState.style.display = "none";
+   }
+   else { alert("wtf"); window.location = "http://www.google.com" }
 }
 
 function setObjToEle(obj, ele){
    ele.style.left = obj.x;
    ele.style.top = obj.y;
 }
-
+function connectToHost(peer) {
+    isClient = true;
+    connection = peer.connect(peerid.value);
+    peer.on("connection", function (dataConnection) {
+        startClientGame();
+    });
+}
+function startHost(peer) {
+    peer.on("open", function (id) {
+        connectionStatusText.innerText = "Send this key to your friend: " + id;
+    });
+    peer.on("connection", function (dataConnection) {
+        connection = dataConnection;
+        startMultiplayerGame();
+    });
+}
 function startGame(){
    gotoState(State.Game);
    WIDTH = window.innerWidth;
@@ -89,6 +139,55 @@ function startGame(){
    setObjToEle(rightBat, rightBatElement);
    //
    gameLoopVar = setInterval(gameLoop,0);
+}
+function startMultiplayerGame() {
+    isMultiplayer = true;
+    gotoState(State.Game);
+    WIDTH = window.innerWidth;
+    HEIGHT = window.innerHeight;
+    gameRunning = true;
+    leftScore = 0;
+    rightScore = 0;
+    getDelta();
+    Ball = new gameObj(WIDTH / 2 - HEIGHT / 100, 11 * HEIGHT / 20, 0, 0);
+    leftBat = new gameObj((HEIGHT * 5) / 100, HEIGHT * 23 / 50, 0, 0);
+    rightBat = new gameObj(WIDTH - 2 * ((HEIGHT * 5) / 100), HEIGHT * 23 / 50, 0, 0);
+    //init
+    if (randInt(1, 2) == 1) {
+        resetBall(1);
+    } else {
+        resetBall(-1);
+    }
+    setObjToEle(Ball, BallElement);
+    setObjToEle(leftBat, leftBatElement);
+    setObjToEle(rightBat, rightBatElement);
+    //
+    gameLoopVar = setInterval(multGameLoop, 0);
+}
+function startClientGame() {
+    //could've used booleans instead of copying everything again, but why not?
+    isMultiplayer = true;
+    gotoState(State.Game);
+    WIDTH = window.innerWidth;
+    HEIGHT = window.innerHeight;
+    gameRunning = true;
+    leftScore = 0;
+    rightScore = 0;
+    getDelta();
+    Ball = new gameObj(WIDTH / 2 - HEIGHT / 100, 11 * HEIGHT / 20, 0, 0);
+    leftBat = new gameObj((HEIGHT * 5) / 100, HEIGHT * 23 / 50, 0, 0);
+    rightBat = new gameObj(WIDTH - 2 * ((HEIGHT * 5) / 100), HEIGHT * 23 / 50, 0, 0);
+    //init
+    if (randInt(1, 2) == 1) {
+        resetBall(1);
+    } else {
+        resetBall(-1);
+    }
+    setObjToEle(Ball, BallElement);
+    setObjToEle(leftBat, leftBatElement);
+    setObjToEle(rightBat, rightBatElement);
+    //
+    gameLoopVar = setInterval(clientGameLoop, 0);
 }
 function input(){
     if(leftBat.vy<0)
@@ -118,7 +217,12 @@ function input(){
       }else{
          gameRunning = true;
          getDelta();
-         gameLoopVar = setInterval(gameLoop,0);
+         if (isMultiplayer && !isClient)
+             gameLoopVar = setInterval(multGameLoop, 0);
+         else if(isMultiplayer && isClient)
+             gameLoopVar = setInterval(clientGameLoop, 0);
+         else
+            gameLoopVar = setInterval(gameLoop,0);
       }
    }
 }
@@ -285,6 +389,16 @@ function gameLoop(){
    gameRender();
    updateFPS();
 }
+function multGameLoop()
+{
+    multGameRender();
+    updateFPS();
+}
+function clientGameLoop()
+{
+    multGameRender();
+    updateFPS();
+}
 function gameRender(){
    setObjToEle(Ball, BallElement);
    setObjToEle(leftBat, leftBatElement);
@@ -292,6 +406,9 @@ function gameRender(){
    leftScoreEle.innerHTML = leftScore;
    rightScoreEle.innerHTML = rightScore;
     debugspin.innerHTML=ballrotation;
+}
+function multGameRender() {
+    
 }
 function saveOptions(){
 	if(document.getElementById("useridbox").value != "") gamerdata.userid = document.getElementById("useridbox").value;

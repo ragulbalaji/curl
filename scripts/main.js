@@ -19,7 +19,7 @@ var ballrotation=0;
 var batAcceleration = 0.1;
 var batWallCoefficient=0.03;
 var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.3, batSpinFriction=0.5, ballTerminalVelocity = Math.SQRT2;
-var CurrentState = 0, State = {MainMenu: 1, Game: 2, Multiplayer: 3, Settings:4, Credits:5};
+var CurrentState = 0, State = {MainMenu: 1, Game: 2, Multiplayer: 3, Settings:4, Credits:5, Connect:6, Waiting:7};
 var XMin = 0, XMax = WIDTH, YMin = 0.17 * HEIGHT, YMax = 0.95 * HEIGHT;
 var ballradius = WIDTH*1/100;
 var keys = new Array(255), oldKeys = new Array(255);
@@ -104,13 +104,11 @@ function setObjToEle(obj, ele){
 function connectToHost(peer) {
     isClient = true;
     connection = peer.connect(peerid.value);
-    peer.on("connection", function (dataConnection) {
-        startClientGame();
-    });
+    startClientGame();
 }
 function startHost(peer) {
     peer.on("open", function (id) {
-        connectionStatusText.innerText = "Send this key to your friend: " + id;
+        connectionStatusText.innerHTML = "Send this key to your friend: " + id;
     });
     peer.on("connection", function (dataConnection) {
         connection = dataConnection;

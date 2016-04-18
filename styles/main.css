@@ -22,7 +22,12 @@ body {
    color:white;
 }
 h1{ font-size:30vh; }
-h2{ font-size:10vh; }
+h2{ font-size:10vh; 
+    z-index:5;
+    -moz-user-select: text; 
+    -webkit-user-select: text;
+     -ms-user-select:text; 
+     user-select:text;}
 h5{ font-size:5vh; }
 a{
  color:silver;

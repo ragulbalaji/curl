@@ -128,19 +128,37 @@ function connectToHost(peer) {
 function setClientParams()
 {
     //set data bindings for the thingy
-    connection.on("data", function (json) {
+    connection.on("data", function (data) {
+        var json = JSON.parse(data);
         if(json.ballpaddlecollisionupdate!=undefined)
         {
             Ball = json.ballpaddlecollisionupdate;
             Ball.x += Ball.vx * json.delta;
             Ball.y += Ball.vy * json.delta;
         }
-        else if(json.scored!=undefined)
+        if(json.ball!=undefined)
         {
-
+            Ball = json.ball;
+        }
+        if(json.scored!=undefined)
+        {
+            if (json.scored.server>rightScore) { // LEFTHIT
+                PointScoredSnd.play();
+                delay(resetDelayInMs);
+                getDelta();
+                updateStats(LOSE);
+                rightScore++;
+            } else if (json.scored.client>leftScore) { //RIGHTHIT
+                PointScoredSnd.play();
+                delay(resetDelayInMs);
+                getDelta();
+                updateStats(WIN);
+                leftScore++;
+            }
         }
         else {
             oldclientplayer = json.clientpaddle;
+            if(clientpaddle!=undefined)
             oldclientpaddle = clientpaddle;
             clientpaddle = json.serverpaddle;
         }
@@ -153,18 +171,12 @@ function setClientParams()
 function setServerParams()
 {
     //ibid. comment
-    connection.on("data", function (json) {
+    connection.on("data", function (data) {
+        var json = JSON.parse(data);
+        if(clientpaddle!=undefined)
         oldclientpaddle = clientpaddle;
         clientpaddle = json.paddle;
         clientdelta = json.clientdelta;
-        if (clientpaddle.vy < -batClampVelocity) {
-            clientpaddle.vy = -batClampVelocity;
-        }
-        else if (clientpaddle.vy > batClampVelocity) {
-            clientpaddle.vy = batClampVelocity;
-        }
-        rightBat.x += clientpaddle.vx * delta;
-        rightBat.y += clientpaddle.vy * delta;
     });
 }
 function startHost(peer) {
@@ -229,6 +241,7 @@ function startMultiplayerGame() {
     setObjToEle(leftBat, leftBatElement);
     setObjToEle(rightBat, rightBatElement);
     //
+    connection.send(JSON.stringify({ ball: Ball }));
     gameLoopVar = setInterval(multGameLoop, 0);
 }
 function startClientGame() {
@@ -245,11 +258,11 @@ function startClientGame() {
     leftBat = new gameObj((HEIGHT * 5) / 100, HEIGHT * 23 / 50, 0, 0);
     rightBat = new gameObj(WIDTH - 2 * ((HEIGHT * 5) / 100), HEIGHT * 23 / 50, 0, 0);
     //init
-    if (randInt(1, 2) == 1) {
+    /*if (randInt(1, 2) == 1) {
         resetBall(1);
     } else {
         resetBall(-1);
-    }
+    }*/
     setObjToEle(Ball, BallElement);
     setObjToEle(leftBat, leftBatElement);
     setObjToEle(rightBat, rightBatElement);
@@ -371,6 +384,27 @@ function score(){
       leftScore++;
    }
 }
+function scoreserver() {
+    if (Ball.x <= XMin) { // LEFTHIT
+        PointScoredSnd.play();
+        delay(resetDelayInMs);
+        getDelta();
+        resetBall(1);
+        getDelta();
+        updateStats(LOSE);
+        rightScore++;
+        connection.send(JSON.stringify({ scored: { client: rightScore, server: leftScore },ball:Ball }));
+    } else if (Ball.x >= XMax) { //RIGHTHIT
+        PointScoredSnd.play();
+        delay(resetDelayInMs);
+        getDelta();
+        resetBall(-1);
+        getDelta();
+        updateStats(WIN);
+        leftScore++;
+        connection.send(JSON.stringify({ scored: { client: rightScore, server: leftScore },ball:Ball }));
+    }
+}
 function gameLoop(){
    getDelta();
    input();
@@ -456,12 +490,14 @@ function gameLoop(){
    gameRender();
    updateFPS();
 }
+var stamp = 0;
 function multGameLoop()
 {
+    stamp++;
     getDelta();
     input();
     //updates
-    score();
+    scoreserver();
     var impult;
     var mangle = Math.atan(Ball.vy / Ball.vx);
     if (Ball.y >= YMax || Ball.y <= YMin) {
@@ -494,7 +530,7 @@ function multGameLoop()
         Ball.vx -= impulse;
         Ball.rotation -= batSpinFriction * relativespeed / ballradius;
         Ball.vy += batBallFrictionCoeff * relativespeed;
-        connection.send({ballpaddlecollisionupdate:Ball,delta:delta});
+        connection.send(JSON.stringify({ballpaddlecollisionupdate:Ball,delta:delta}));
         document.getElementById("relativespeed").innerHTML = relativespeed;
     } else if (Ball.x <= leftBat.x + (HEIGHT * 5 / 100)
              && Ball.x >= leftBat.x
@@ -509,7 +545,7 @@ function multGameLoop()
         Ball.vx -= impulse;
         Ball.rotation += batSpinFriction * relativespeed / ballradius;
         Ball.vy += batBallFrictionCoeff * relativespeed;
-        connection.send({ ballpaddlecollisionupdate: Ball,delta:delta });
+        connection.send(JSON.stringify({ ballpaddlecollisionupdate: Ball,delta:delta }));
         //client should animate ball
         document.getElementById("relativespeed").innerHTML = relativespeed;
     }
@@ -531,16 +567,111 @@ function multGameLoop()
     else if (leftBat.vy < -batClampVelocity) {
         leftBat.vy = -batClampVelocity;
     }
-    
+    if (clientpaddle != undefined) {
+        if (clientpaddle.vy < -batClampVelocity) {
+            clientpaddle.vy = -batClampVelocity;
+        }
+        else if (clientpaddle.vy > batClampVelocity) {
+            clientpaddle.vy = batClampVelocity;
+        }
+    }
+    if (clientpaddle != undefined) {
+        rightBat.x += clientpaddle.vx * delta;
+        rightBat.y += clientpaddle.vy * delta;
+    }
     leftBat.x += leftBat.vx * delta;
     leftBat.y += leftBat.vy * delta;
     Ball.x += Ball.vx * delta;
     Ball.y += Ball.vy * delta;
+    connection.send(JSON.stringify({ serverpaddle: leftBat, clientpaddle: rightBat }));
     multGameRender();
     updateFPS();
 }
 function clientGameLoop()
 {
+    if (oldclientplayer != undefined)
+    {
+        leftBat.y = oldclientplayer.y;
+        leftBat.vy = oldclientplayer.vy;
+    };
+    getDelta();
+    input();
+    //updates
+    //score();
+    var impult;
+    var mangle = Math.atan(Ball.vy / Ball.vx);
+    if (Ball.y >= YMax || Ball.y <= YMin) {
+        if (Ball.y >= YMax)
+            var relativespeed = Ball.vx + Ball.rotation * 2;
+        else if (Ball.y <= YMin)
+            var relativespeed = Ball.vx + Ball.rotation * 2;
+        impult = Ball.vy + ballBounceEfficiency * Ball.vy;
+        ballHitWallSnd.play();
+        Ball.vy -= impult;
+        //ballrotation+=batWallCoefficient*relativespeed/2;
+        //Ball.vx+=batWallCoefficient*relativespeed;
+        if (Ball.y >= YMax) {
+            Ball.y = YMax;
+        } else {
+            Ball.y = YMin;
+        }
+    }
+    var impulse;
+    var angle = Math.atan(Ball.vy / Ball.vx);
+    if (Ball.x + (HEIGHT * 2 / 100) >= rightBat.x
+       && Ball.x + (HEIGHT * 2 / 100) <= rightBat.x + (HEIGHT * 5 / 100)
+       && Ball.y + (HEIGHT * 1 / 100) >= rightBat.y
+       && Ball.y + (HEIGHT * 1 / 100) <= rightBat.y + (HEIGHT * 20 / 100)) {
+        ballHitBatSnd.play();
+        Ball.x = rightBat.x - 2 * HEIGHT / 100;
+        var relativespeed = -Ball.vy + Ball.rotation * ballradius + rightBat.vy;
+        impulse = Ball.vx + ballBounceEfficiency * Ball.vx;
+        var normal = impulse / delta;
+        Ball.vx -= impulse;
+        Ball.rotation -= batSpinFriction * relativespeed / ballradius;
+        Ball.vy += batBallFrictionCoeff * relativespeed;
+        document.getElementById("relativespeed").innerHTML = relativespeed;
+    } else if (Ball.x <= leftBat.x + (HEIGHT * 5 / 100)
+             && Ball.x >= leftBat.x
+             && Ball.y + (HEIGHT * 1 / 100) >= leftBat.y
+             && Ball.y + (HEIGHT * 1 / 100) <= leftBat.y + (HEIGHT * 20 / 100)) {
+        ballHitBatSnd.play();
+        ballpath();
+        Ball.x = leftBat.x + 7 * HEIGHT / 100;
+        var relativespeed = -Ball.vy - Ball.rotation * ballradius + leftBat.vy;
+        impulse = Ball.vx + ballBounceEfficiency * Ball.vx;
+        var normal = impulse / delta;
+        Ball.vx -= impulse;
+        Ball.rotation += batSpinFriction * relativespeed / ballradius;
+        Ball.vy += batBallFrictionCoeff * relativespeed;
+        document.getElementById("relativespeed").innerHTML = relativespeed;
+    }
+    if (rightBat.y >= YMax - (HEIGHT * 19 / 100)) {
+        rightBat.y = YMax - (HEIGHT * 19 / 100);
+    } else if (rightBat.y <= YMin + (HEIGHT / 100)) {
+        rightBat.y = YMin + (HEIGHT / 100);
+    }
+    if (leftBat.y >= YMax - (HEIGHT * 19 / 100)) {
+        leftBat.y = YMax - (HEIGHT * 19 / 100 + 1);
+        leftBat.vy = -0.4;
+    } else if (leftBat.y <= YMin + (HEIGHT / 100 + 1)) {
+        leftBat.y = YMin + (HEIGHT / 100);
+        leftBat.vy = +0.4;
+    }
+    if (leftBat.vy > batClampVelocity) {
+        leftBat.vy = batClampVelocity;
+    }
+    else if (leftBat.vy < -batClampVelocity) {
+        leftBat.vy = -batClampVelocity;
+    }
+    leftBat.x += leftBat.vx * delta;
+    leftBat.y += leftBat.vy * delta;
+    rightBat.x += rightBat.vx * delta;
+    rightBat.y += rightBat.vy * delta;
+    Ball.x += Ball.vx * delta;
+    Ball.y += Ball.vy * delta;
+    connection.send(JSON.stringify({ paddle: leftBat,clientdelta:delta }));
+    //
     multGameRender();
     updateFPS();
 }
@@ -555,8 +686,14 @@ function gameRender(){
 function multGameRender() {
     setObjToEle(Ball, BallElement);
     setObjToEle(leftBat, leftBatElement);
-    var lerpstep = clientdelta / delta;
-    var rightbatto = new gameObj(clientpaddle.x, oldclientpaddle.y+(clientpaddle.y-oldclientpaddle.y)*lerpstep, clientpaddle.vx, clientpaddle.vy);
+    var lerpstep = 0.8;
+    if(clientdelta!=undefined)
+        lerpstep = clientdelta / delta;
+    var rightbatto;
+    if (oldclientpaddle != undefined && clientpaddle != undefined)
+        rightbatto = new gameObj(rightBat.x, oldclientpaddle.y + (clientpaddle.y - oldclientpaddle.y) * lerpstep, rightBat.vx, clientpaddle.vy);
+    else
+        rightbatto = rightBat;
     setObjToEle(rightbatto, rightBatElement);
     leftScoreEle.innerHTML = leftScore;
     rightScoreEle.innerHTML = rightScore;

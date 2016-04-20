@@ -133,12 +133,16 @@ function setClientParams()
         if(json.ballpaddlecollisionupdate!=undefined)
         {
             Ball = json.ballpaddlecollisionupdate;
-            Ball.x += Ball.vx * json.delta;
-            Ball.y += Ball.vy * json.delta;
+            Ball.vx = -Ball.vx;
+            Ball.rotation = -Ball.rotation;
+            Ball.x = WIDTH - Ball.x;
         }
         if(json.ball!=undefined)
         {
             Ball = json.ball;
+            Ball.vx = -Ball.vx;
+            Ball.rotation = -Ball.rotation;
+            Ball.x = WIDTH - Ball.x;
         }
         if(json.scored!=undefined)
         {
@@ -549,6 +553,8 @@ function multGameLoop()
         //client should animate ball
         document.getElementById("relativespeed").innerHTML = relativespeed;
     }
+        Ball.x += Ball.vx * delta;
+        Ball.y += Ball.vy * delta;
     if (rightBat.y >= YMax - (HEIGHT * 19 / 100)) {
         rightBat.y = YMax - (HEIGHT * 19 / 100);
     } else if (rightBat.y <= YMin + (HEIGHT / 100)) {
@@ -581,8 +587,6 @@ function multGameLoop()
     }
     leftBat.x += leftBat.vx * delta;
     leftBat.y += leftBat.vy * delta;
-    Ball.x += Ball.vx * delta;
-    Ball.y += Ball.vy * delta;
     connection.send(JSON.stringify({ serverpaddle: leftBat, clientpaddle: rightBat }));
     multGameRender();
     updateFPS();
@@ -592,7 +596,6 @@ function clientGameLoop()
     if (oldclientplayer != undefined)
     {
         leftBat.y = oldclientplayer.y;
-        leftBat.vy = oldclientplayer.vy;
     };
     getDelta();
     input();
@@ -646,6 +649,8 @@ function clientGameLoop()
         Ball.vy += batBallFrictionCoeff * relativespeed;
         document.getElementById("relativespeed").innerHTML = relativespeed;
     }
+        Ball.x += Ball.vx * delta;
+        Ball.y += Ball.vy * delta;
     if (rightBat.y >= YMax - (HEIGHT * 19 / 100)) {
         rightBat.y = YMax - (HEIGHT * 19 / 100);
     } else if (rightBat.y <= YMin + (HEIGHT / 100)) {
@@ -668,8 +673,6 @@ function clientGameLoop()
     leftBat.y += leftBat.vy * delta;
     rightBat.x += rightBat.vx * delta;
     rightBat.y += rightBat.vy * delta;
-    Ball.x += Ball.vx * delta;
-    Ball.y += Ball.vy * delta;
     connection.send(JSON.stringify({ paddle: leftBat,clientdelta:delta }));
     //
     multGameRender();

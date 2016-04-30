@@ -47,10 +47,10 @@ var CurrentState = 0,
         Waiting: 7
     };
 var XMin = 0,
-    XMax = SceneWidth,
-    YMin = 0.17 * SceneHeight,
-    YMax = 0.95 * SceneHeight;
-var ballradius = SceneWidth * 1 / 100;
+    XMax = WIDTH,
+    YMin = 0.17 * HEIGHT,
+    YMax = 0.95 * HEIGHT;
+var ballradius = WIDTH * 1 / 100;
 var keys = new Array(255),
     oldKeys = new Array(255);
 var resetDelayInMs = 50;
@@ -58,8 +58,6 @@ var ballRotationalInertia = 0.02;
 var isMultiplayer = false;
 var isClient = false;
 var connection;
-var SceneWidth = 1600,
-    SceneHeight = 800;
 //server viewing client
 var clientpaddle, oldclientpaddle;
 //client-side player paddle
@@ -244,9 +242,9 @@ function startGame() {
     leftScore = 0;
     rightScore = 0;
     getDelta();
-    Ball = new ball(SceneWidth / 2 - 5, SceneHeight / 2 - 5, 0, 0, 0);
-    leftBat = new gameObj(80, SceneHeight / 2 - 90, 0, 0);
-    rightBat = new gameObj(SceneWidth - 80, SceneHeight / 2 - 90, 0, 0);
+    Ball = new ball(WIDTH / 2 - HEIGHT / 100, 11 * HEIGHT / 20, 0, 0, 0);
+    leftBat = new gameObj((HEIGHT * 5) / 100, HEIGHT * 23 / 50, 0, 0);
+    rightBat = new gameObj(WIDTH - 2 * ((HEIGHT * 5) / 100), HEIGHT * 23 / 50, 0, 0);
     //init
     if (randInt(1, 2) == 1) {
         resetBall(1);
@@ -269,9 +267,9 @@ function startMultiplayerGame() {
     leftScore = 0;
     rightScore = 0;
     getDelta();
-    Ball = new ball(SceneWidth / 2 - 5, SceneHeight / 2 - 5, 0, 0, 0);
-    leftBat = new gameObj(80, SceneHeight / 2 - 90, 0, 0);
-    rightBat = new gameObj(SceneWidth - 80, SceneHeight / 2 - 90, 0, 0);
+    Ball = new gameObj(WIDTH / 2 - HEIGHT / 100, 11 * HEIGHT / 20, 0, 0);
+    leftBat = new gameObj((HEIGHT * 5) / 100, HEIGHT * 23 / 50, 0, 0);
+    rightBat = new gameObj(WIDTH - 2 * ((HEIGHT * 5) / 100), HEIGHT * 23 / 50, 0, 0);
     //init
     if (randInt(1, 2) == 1) {
         resetBall(1);
@@ -298,9 +296,10 @@ function startClientGame() {
     leftScore = 0;
     rightScore = 0;
     getDelta();
-    Ball = new ball(SceneWidth / 2 - 5, SceneHeight / 2 - 5, 0, 0, 0);
-    leftBat = new gameObj(80, SceneHeight / 2 - 90, 0, 0);
-    rightBat = new gameObj(SceneWidth - 80, SceneHeight / 2 - 90, 0, 0);
+
+    Ball = new gameObj(WIDTH / 2 - HEIGHT / 100, 11 * HEIGHT / 20, 0, 0);
+    leftBat = new gameObj((HEIGHT * 5) / 100, HEIGHT * 23 / 50, 0, 0);
+    rightBat = new gameObj(WIDTH - 2 * ((HEIGHT * 5) / 100), HEIGHT * 23 / 50, 0, 0);
     //init
     /*if (randInt(1, 2) == 1) {
         resetBall(1);
@@ -348,12 +347,12 @@ function input() {
     }
 }
 
-function touch(x, y, action) {
+function touch(x, y, action) { <
     leftBat.vy = 0;
-    if (x <= SceneWidth / 2 && action) {
-        if (y < leftBat.y + 90) {
+    if (x <= WIDTH / 2 && action) {
+        if (y < leftBat.y + (HEIGHT * 9 / 100)) {
             leftBat.vy = -batMoveVelocity;
-        } else if (y > leftBat.y + 90) {
+        } else if (y > leftBat.y + (HEIGHT * 9 / 100)) {
             leftBat.vy = batMoveVelocity;
         }
     }
@@ -364,18 +363,19 @@ var angle = 0;
 function ballpath() {
     angle = Math.atan2(Ball.vy, Ball.vx);
     var angletonearestedge;
+
     if (Ball.vy > 0) {
-        angletonearestedge = Math.atan2((SceneHeight - Ball.y), SceneWidth);
+        angletonearestedge = Math.atan2((HEIGHT - Ball.y), WIDTH);
     } else if (Ball.vy < 0) {
-        angletonearestedge = Math.atan2(-Ball.y, SceneWidth);
+        angletonearestedge = Math.atan2(-Ball.y, WIDTH);
     }
     if (Math.abs(angle) < Math.abs(angletonearestedge)) {
         //linear assignment
-        yhit = Math.tan(angle) * SceneWidth + Ball.y;
+        yhit = Math.tan(angle) * WIDTH + Ball.y;
     } else {
         var period = angle;
         var phase = Ball.y * (Ball.vy, Math.abs(Ball.vy));
-        yhit = SceneHeight * Math.sin((2 * Math.PI / period) * SceneWidth);
+        yhit = HEIGHT * Math.sin((2 * Math.PI / period) * WIDTH);
         yhit = 0
     }
 
@@ -383,13 +383,18 @@ function ballpath() {
 
 function ai() {
     //if we visualise the ball and the couse as a sine wave, we can use that to calculate the ball's end position and be there
+
     if (yhit == 0) {
-        if (Ball.y > rightBat.y + 90) {
+        if (Ball.y > rightBat.y + (HEIGHT * 9 / 100)) {
             rightBat.vy = batMoveVelocity;
-        } else if (Ball.y < rightBat.y + 90) {
+        } else if (Ball.y < rightBat.y + (HEIGHT * 9 / 100)) {
             rightBat.vy = -batMoveVelocity;
         } else {
             rightBat.vy = 0;
+        }
+    } else {
+        if (rightBat.y > yhit) {
+            rightBat.vy = -batMoveVelocity;
         }
     } else {
         if (rightBat.y > yhit) {
@@ -640,7 +645,7 @@ function clientGameLoop() {
         ballHitWallSnd.play();
         Ball.vy -= impult;
         //ballrotation+=batWallCoefficient*relativespeed/2;
-        //Ball.vx+=batWallCoefficient*relativespeed;f
+        //Ball.vx+=batWallCoefficient*relativespeed;
         if (Ball.y >= YMax) {
             Ball.y = YMax;
         } else {
@@ -713,14 +718,15 @@ function gameRender() {
 }
 
 function multGameRender() {
-    setObjToEle(new gameObj(Ball.x * WIDTH / SceneWidth, Ball.y * HEIGHT / SceneHeight, Ball.vx, Ball.vy), BallElement);
-    setObjToEle(new gameObj(leftBat.x * WIDTH / SceneWidth, leftBat.y * HEIGHT / SceneHeight, leftBat.vx, leftBat.vy), leftBatElement);
+    setObjToEle(Ball, BallElement);
+    setObjToEle(leftBat, leftBatElement);
     var lerpstep = 0.8;
     if (clientdelta != undefined)
         lerpstep = clientdelta / delta;
     var rightbatto;
     if (oldclientpaddle != undefined && clientpaddle != undefined)
-        rightbatto = new gameObj(rightBat.x * WIDTH / SceneWidth, (oldclientpaddle.y + (clientpaddle.y - oldclientpaddle.y) * lerpstep) * HEIGHT / SceneHeight, rightBat.vx, clientpaddle.vy);
+
+        rightbatto = new gameObj(rightBat.x, oldclientpaddle.y + (clientpaddle.y - oldclientpaddle.y) * lerpstep, rightBat.vx, clientpaddle.vy);
     else
         rightbatto = rightBat;
     setObjToEle(rightbatto, rightBatElement);
@@ -748,11 +754,12 @@ function ball(px, py, pvx, pvy, ballrotation) {
     this.vx = pvx;
     this.vy = pvy;
     this.rotation = ballrotation;
+
 }
 
 function resetBall(direction) {
-    Ball.x = SceneWidth / 2 - SceneHeight / 100;
-    Ball.y = 11 * SceneHeight / 20;
+    Ball.x = WIDTH / 2 - HEIGHT / 100;
+    Ball.y = 11 * HEIGHT / 20;
     Ball.vx = (randInt(3, 8) / (10 * direction));
     Ball.vy = Math.random() - 0.5;
     Ball.rotation = 0;

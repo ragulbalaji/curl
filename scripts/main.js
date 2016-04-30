@@ -215,6 +215,13 @@ function setServerParams() {
             oldclientpaddle = clientpaddle;
         clientpaddle = json.paddle;
         clientdelta = json.clientdelta;
+        if (clientpaddle.vy < -batClampVelocity) {
+            clientpaddle.vy = -batClampVelocity;
+        } else if (clientpaddle.vy > batClampVelocity) {
+            clientpaddle.vy = batClampVelocity;
+        }
+        rightBat.x += clientpaddle.vx * delta;
+        rightBat.y += clientpaddle.vy * delta;
     });
 }
 
@@ -302,11 +309,11 @@ function startClientGame() {
     leftBat = new gameObj(80, SceneHeight / 2 - 90, 0, 0);
     rightBat = new gameObj(SceneWidth - 80, SceneHeight / 2 - 90, 0, 0);
     //init
-    /*if (randInt(1, 2) == 1) {
+    if (randInt(1, 2) == 1) {
         resetBall(1);
     } else {
         resetBall(-1);
-    }*/
+    }
     setObjToEle(Ball, BallElement);
     setObjToEle(leftBat, leftBatElement);
     setObjToEle(rightBat, rightBatElement);
@@ -537,7 +544,7 @@ function multGameLoop() {
     getDelta();
     input();
     //updates
-    scoreserver();
+    score();
     var impult;
     var mangle = Math.atan(Ball.vy / Ball.vx);
     if (Ball.y >= YMax || Ball.y <= YMin) {

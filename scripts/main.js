@@ -20,14 +20,15 @@ var batAcceleration = 0.1;
 var batWallCoefficient=0.03;
 var ballBounceEfficiency = 0.999, batMoveVelocity = 0.4, batBallFrictionCoeff = 0.3, batSpinFriction=0.5, ballTerminalVelocity = Math.SQRT2;
 var CurrentState = 0, State = {MainMenu: 1, Game: 2, Multiplayer: 3, Settings:4, Credits:5, Connect:6, Waiting:7};
-var XMin = 0, XMax = WIDTH, YMin = 0.17 * HEIGHT, YMax = 0.95 * HEIGHT;
-var ballradius = WIDTH*1/100;
+var XMin = 0, XMax = SceneWidth, YMin = 0.17 * SceneHeight, YMax = 0.95 *SceneHeight;
+var ballradius = SceneWidth*1/100;
 var keys = new Array(255), oldKeys = new Array(255);
 var resetDelayInMs = 50;
 var ballRotationalInertia = 0.02;
 var isMultiplayer = false;
 var isClient = false;
 var connection;
+var SceneWidth=1600, SceneHeight=800;
 //server viewing client
 var clientpaddle, oldclientpaddle;
 //client-side player paddle
@@ -135,14 +136,14 @@ function setClientParams()
             Ball = json.ballpaddlecollisionupdate;
             Ball.vx = -Ball.vx;
             Ball.rotation = -Ball.rotation;
-            Ball.x = WIDTH - Ball.x;
+            Ball.x = SceneWidth - Ball.x;
         }
         if(json.ball!=undefined)
         {
             Ball = json.ball;
             Ball.vx = -Ball.vx;
             Ball.rotation = -Ball.rotation;
-            Ball.x = WIDTH - Ball.x;
+            Ball.x = SceneWidth - Ball.x;
         }
         if(json.scored!=undefined)
         {
@@ -208,9 +209,9 @@ function startGame(){
    leftScore = 0;
    rightScore = 0;
    getDelta();
-   Ball = new ball(WIDTH/2-HEIGHT/100,11*HEIGHT/20,0,0,0);
-   leftBat = new gameObj((HEIGHT*5)/100,HEIGHT*23/50,0,0);
-   rightBat = new gameObj(WIDTH - 2*((HEIGHT*5)/100),HEIGHT*23/50,0,0);
+   Ball = new ball(SceneWidth/2-SceneHeight/100,11*SceneHeight/20,0,0,0);
+   leftBat = new gameObj((SceneHeight*5)/100,SceneHeight*23/50,0,0);
+   rightBat = new gameObj(SceneWidth - 2*((SceneHeight*5)/100),SceneHeight*23/50,0,0);
    //init
    if(randInt(1,2)==1){
       resetBall(1);
@@ -232,9 +233,9 @@ function startMultiplayerGame() {
     leftScore = 0;
     rightScore = 0;
     getDelta();
-    Ball = new gameObj(WIDTH / 2 - HEIGHT / 100, 11 * HEIGHT / 20, 0, 0);
-    leftBat = new gameObj((HEIGHT * 5) / 100, HEIGHT * 23 / 50, 0, 0);
-    rightBat = new gameObj(WIDTH - 2 * ((HEIGHT * 5) / 100), HEIGHT * 23 / 50, 0, 0);
+    Ball = new ball(SceneWidth / 2 - SceneHeight / 100, 11 * SceneHeight / 20, 0, 0, 0);
+    leftBat = new gameObj((SceneHeight * 5) / 100, SceneHeight * 23 / 50, 0, 0);
+    rightBat = new gameObj(SceneWidth - 2 * ((SceneHeight * 5) / 100), SceneHeight * 23 / 50, 0, 0);
     //init
     if (randInt(1, 2) == 1) {
         resetBall(1);
@@ -258,9 +259,9 @@ function startClientGame() {
     leftScore = 0;
     rightScore = 0;
     getDelta();
-    Ball = new gameObj(WIDTH / 2 - HEIGHT / 100, 11 * HEIGHT / 20, 0, 0);
-    leftBat = new gameObj((HEIGHT * 5) / 100, HEIGHT * 23 / 50, 0, 0);
-    rightBat = new gameObj(WIDTH - 2 * ((HEIGHT * 5) / 100), HEIGHT * 23 / 50, 0, 0);
+    Ball = new ball(SceneWidth / 2 - SceneHeight / 100, 11 * SceneHeight / 20, 0, 0, 0);
+    leftBat = new gameObj((SceneHeight * 5) / 100, SceneHeight * 23 / 50, 0, 0);
+    rightBat = new gameObj(SceneWidth - 2 * ((SceneHeight * 5) / 100), SceneHeight * 23 / 50, 0, 0);
     //init
     /*if (randInt(1, 2) == 1) {
         resetBall(1);
@@ -312,10 +313,10 @@ function input(){
 }
 function touch(x, y, action) {
    leftBat.vy = 0;
-   if(x <= WIDTH/2 && action){
-      if(y < leftBat.y+(HEIGHT*9/100)){
+   if(x <= SceneWidth/2 && action){
+      if(y < leftBat.y+(SceneHeight*9/100)){
          leftBat.vy = -batMoveVelocity;
-      }else if(y > leftBat.y+(HEIGHT*9/100)){
+      }else if(y > leftBat.y+(SceneHeight*9/100)){
          leftBat.vy = batMoveVelocity;
       }
    }
@@ -327,21 +328,21 @@ function ballpath(){
     var angletonearestedge;
     if(Ball.vy>0)
     {
-        angletonearestedge= Math.atan2((HEIGHT-Ball.y),WIDTH);
+        angletonearestedge= Math.atan2((SceneHeight-Ball.y),SceneWidth);
     }
     else if(Ball.vy<0)
     {
-        angletonearestedge= Math.atan2(-Ball.y,WIDTH);
+        angletonearestedge= Math.atan2(-Ball.y,SceneWidth);
     }
     if(Math.abs(angle)<Math.abs(angletonearestedge))
     {
         //linear assignment
-        yhit = Math.tan(angle)*WIDTH+Ball.y;
+        yhit = Math.tan(angle)*SceneWidth+Ball.y;
     }
     else{
         var period = angle;
         var phase = Ball.y*(Ball.vy,Math.abs(Ball.vy));
-        yhit = HEIGHT*Math.sin((2*Math.PI/period)*WIDTH);
+        yhit = SceneHeight*Math.sin((2*Math.PI/period)*SceneWidth);
         yhit=0
     }
     
@@ -349,9 +350,9 @@ function ballpath(){
 function ai(){
     //if we visualise the ball and the couse as a sine wave, we can use that to calculate the ball's end position and be there
     if(yhit==0){
-        if(Ball.y > rightBat.y+(HEIGHT*9/100)){
+        if(Ball.y > rightBat.y+(SceneHeight*9/100)){
         rightBat.vy = batMoveVelocity;
-    }else if(Ball.y < rightBat.y+(HEIGHT*9/100)){
+    }else if(Ball.y < rightBat.y+(SceneHeight*9/100)){
         rightBat.vy = -batMoveVelocity;
     }else{
         rightBat.vy = 0;
@@ -612,7 +613,7 @@ function clientGameLoop()
         ballHitWallSnd.play();
         Ball.vy -= impult;
         //ballrotation+=batWallCoefficient*relativespeed/2;
-        //Ball.vx+=batWallCoefficient*relativespeed;
+        //Ball.vx+=batWallCoefficient*relativespeed;f
         if (Ball.y >= YMax) {
             Ball.y = YMax;
         } else {
@@ -687,14 +688,14 @@ function gameRender(){
     debugspin.innerHTML=Ball.rotation;
 }
 function multGameRender() {
-    setObjToEle(Ball, BallElement);
-    setObjToEle(leftBat, leftBatElement);
+    setObjToEle(new gameObj(Ball.x*WIDTH/SceneWidth,Ball.y*HEIGHT/SceneHeight,Ball.vx,Ball.vy), BallElement);
+    setObjToEle(new gameObj(leftBat.x*WIDTH/SceneWidth,leftBat.y*HEIGHT/SceneHeight,leftBat.vx,leftBat.vy), leftBatElement);
     var lerpstep = 0.8;
     if(clientdelta!=undefined)
         lerpstep = clientdelta / delta;
     var rightbatto;
     if (oldclientpaddle != undefined && clientpaddle != undefined)
-        rightbatto = new gameObj(rightBat.x, oldclientpaddle.y + (clientpaddle.y - oldclientpaddle.y) * lerpstep, rightBat.vx, clientpaddle.vy);
+        rightbatto = new gameObj(rightBat.x*WIDTH/SceneWidth, (oldclientpaddle.y + (clientpaddle.y - oldclientpaddle.y) * lerpstep)*HEIGHT/SceneHeight, rightBat.vx, clientpaddle.vy);
     else
         rightbatto = rightBat;
     setObjToEle(rightbatto, rightBatElement);
@@ -720,8 +721,8 @@ function ball(px, py, pvx, pvy,ballrotation) {
     this.vy = pvy;
     this.rotation = ballrotation;
 } function resetBall(direction) {
-   Ball.x = WIDTH/2-HEIGHT/100;
-   Ball.y = 11*HEIGHT/20;
+   Ball.x = SceneWidth/2-SceneHeight/100;
+   Ball.y = 11*SceneHeight/20;
    Ball.vx = (randInt(3,8)/(10*direction));
    Ball.vy = Math.random()-0.5;
     Ball.rotation=0;

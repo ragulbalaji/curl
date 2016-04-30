@@ -347,7 +347,7 @@ function input() {
     }
 }
 
-function touch(x, y, action) { <
+function touch(x, y, action) { 
     leftBat.vy = 0;
     if (x <= WIDTH / 2 && action) {
         if (y < leftBat.y + (HEIGHT * 9 / 100)) {
@@ -395,14 +395,11 @@ function ai() {
     } else {
         if (rightBat.y > yhit) {
             rightBat.vy = -batMoveVelocity;
-        }
-    } else {
-        if (rightBat.y > yhit) {
-            rightBat.vy = -batMoveVelocity;
         } else if (rightBat.y < yhit) {
             rightBat.vy = batMoveVelocity;
         }
-    }
+}
+    
 }
 
 function score() {

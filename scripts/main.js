@@ -66,12 +66,6 @@ var oldclientplayer;
 var clientdelta;
 var peerid = document.getElementById("peerid");
 gamerCheckIn();
-leftBatElement.style.height = 180 * HEIGHT / SceneHeight;
-rightBatElement.style.width = 80 * WIDTH / SceneWidth;
-leftBatElement.style.width = 80 * WIDTH / SceneWidth;
-rightBatElement.style.height = 180 * HEIGHT / SceneHeight;
-BallElement.style.height = 10 * HEIGHT / SceneHeight;
-BallElement.style.width = 10 * WIDTH / SceneWidth;
 var splashes = ["A Ball Game with Physics", gamerdata.userid + " has " + gamerdata.wins + " wins & " + gamerdata.losses + " losses", "PONG IS BACK!", "I was bored, so I made this.", "Ping Pong " + gamerdata.userid + "?", "Let's Dance", "As seen on TV!", "100% pure!", "Hello, " + gamerdata.userid + "!", "Made by Ragul", "Singleplayer!", "Multiplayer!", "Haha, Lol", "Hand Hurts", "I Should Sleep.", "Made in Singapore", "Open Source without intention", "Wow!", "Not on Steam!", "Now with difficulty!", "90% insect or bug free!", "Soon with real balls.", "Mostly HTML5", "Minecraft is Better", "<strike>Thousands of</strike> 2 colors!"];
 
 function gotoState(id) {

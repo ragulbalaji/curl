@@ -37,6 +37,12 @@ var oldclientplayer;
 var clientdelta;
 var peerid = document.getElementById("peerid");
 gamerCheckIn();
+leftBatElement.style.height = 180 * HEIGHT / SceneHeight;
+rightBatElement.style.width = 80 * WIDTH / SceneWidth;
+leftBatElement.style.width = 80 * WIDTH / SceneWidth;
+rightBatElement.style.height = 180 * HEIGHT / SceneHeight;
+BallElement.style.height = 10 * HEIGHT / SceneHeight;
+BallElement.style.width = 10 * WIDTH / SceneWidth;
 var splashes = ["A Ball Game with Physics", gamerdata.userid + " has " + gamerdata.wins + " wins & " + gamerdata.losses + " losses", "PONG IS BACK!", "I was bored, so I made this.", "Ping Pong " + gamerdata.userid + "?", "Let's Dance", "As seen on TV!", "100% pure!", "Hello, " +gamerdata.userid +"!","Made by Ragul","Singleplayer!","Multiplayer!","Haha, Lol","Hand Hurts","I Should Sleep.","Made in Singapore","Open Source without intention","Wow!","Not on Steam!","Now with difficulty!","90% insect or bug free!","Soon with real balls.","Mostly HTML5","Minecraft is Better","<strike>Thousands of</strike> 2 colors!"];
 function gotoState(id) {
    if(id == State.MainMenu){
@@ -209,9 +215,9 @@ function startGame(){
    leftScore = 0;
    rightScore = 0;
    getDelta();
-   Ball = new ball(SceneWidth/2-SceneHeight/100,11*SceneHeight/20,0,0,0);
-   leftBat = new gameObj((SceneHeight*5)/100,SceneHeight*23/50,0,0);
-   rightBat = new gameObj(SceneWidth - 2*((SceneHeight*5)/100),SceneHeight*23/50,0,0);
+   Ball = new ball(SceneWidth / 2 - 5, SceneHeight/2 - 5, 0, 0, 0);
+   leftBat = new gameObj(80, SceneHeight/2-90, 0, 0);
+   rightBat = new gameObj(SceneWidth - 80, SceneHeight/2-90, 0, 0);
    //init
    if(randInt(1,2)==1){
       resetBall(1);
@@ -233,9 +239,9 @@ function startMultiplayerGame() {
     leftScore = 0;
     rightScore = 0;
     getDelta();
-    Ball = new ball(SceneWidth / 2 - SceneHeight / 100, 11 * SceneHeight / 20, 0, 0, 0);
-    leftBat = new gameObj((SceneHeight * 5) / 100, SceneHeight * 23 / 50, 0, 0);
-    rightBat = new gameObj(SceneWidth - 2 * ((SceneHeight * 5) / 100), SceneHeight * 23 / 50, 0, 0);
+    Ball = new ball(SceneWidth / 2 - 5, SceneHeight / 2 - 5, 0, 0, 0);
+    leftBat = new gameObj(80, SceneHeight / 2 - 90, 0, 0);
+    rightBat = new gameObj(SceneWidth - 80, SceneHeight / 2 - 90, 0, 0);
     //init
     if (randInt(1, 2) == 1) {
         resetBall(1);
@@ -259,9 +265,9 @@ function startClientGame() {
     leftScore = 0;
     rightScore = 0;
     getDelta();
-    Ball = new ball(SceneWidth / 2 - SceneHeight / 100, 11 * SceneHeight / 20, 0, 0, 0);
-    leftBat = new gameObj((SceneHeight * 5) / 100, SceneHeight * 23 / 50, 0, 0);
-    rightBat = new gameObj(SceneWidth - 2 * ((SceneHeight * 5) / 100), SceneHeight * 23 / 50, 0, 0);
+    Ball = new ball(SceneWidth / 2 - 5, SceneHeight / 2 - 5, 0, 0, 0);
+    leftBat = new gameObj(80, SceneHeight / 2 - 90, 0, 0);
+    rightBat = new gameObj(SceneWidth - 80, SceneHeight / 2 - 90, 0, 0);
     //init
     /*if (randInt(1, 2) == 1) {
         resetBall(1);
@@ -314,9 +320,9 @@ function input(){
 function touch(x, y, action) {
    leftBat.vy = 0;
    if(x <= SceneWidth/2 && action){
-      if(y < leftBat.y+(SceneHeight*9/100)){
+      if(y < leftBat.y+90){
          leftBat.vy = -batMoveVelocity;
-      }else if(y > leftBat.y+(SceneHeight*9/100)){
+      }else if(y > leftBat.y+90){
          leftBat.vy = batMoveVelocity;
       }
    }
@@ -350,9 +356,9 @@ function ballpath(){
 function ai(){
     //if we visualise the ball and the couse as a sine wave, we can use that to calculate the ball's end position and be there
     if(yhit==0){
-        if(Ball.y > rightBat.y+(SceneHeight*9/100)){
+        if(Ball.y > rightBat.y+90){
         rightBat.vy = batMoveVelocity;
-    }else if(Ball.y < rightBat.y+(SceneHeight*9/100)){
+    }else if(Ball.y < rightBat.y+90){
         rightBat.vy = -batMoveVelocity;
     }else{
         rightBat.vy = 0;
@@ -436,12 +442,12 @@ function gameLoop(){
    ai();
     var impulse;
     var angle=Math.atan(Ball.vy/Ball.vx);
-   if(Ball.x+(HEIGHT*2/100) >= rightBat.x 
-      && Ball.x+(HEIGHT*2/100) <= rightBat.x+(HEIGHT*5/100) 
-      && Ball.y+(HEIGHT*1/100) >= rightBat.y 
-      && Ball.y+(HEIGHT*1/100) <= rightBat.y+(HEIGHT*20/100)){
+   if(Ball.x+10 >= rightBat.x 
+      && Ball.x+10 <= rightBat.x+80 
+      && Ball.y+10 >= rightBat.y 
+      && Ball.y <= rightBat.y+180){
           ballHitBatSnd.play();
-          Ball.x=rightBat.x-2*HEIGHT/100;
+          Ball.x=rightBat.x-20;
        var relativespeed = -Ball.vy+Ball.rotation*ballradius+rightBat.vy;
        impulse = Ball.vx+ballBounceEfficiency*Ball.vx;
        var normal = impulse/delta;
@@ -449,13 +455,13 @@ function gameLoop(){
        Ball.rotation -= batSpinFriction*relativespeed/ballradius;
         Ball.vy+=batBallFrictionCoeff*relativespeed;
        document.getElementById("relativespeed").innerHTML=relativespeed;
-   }else if(Ball.x <= leftBat.x+(HEIGHT*5/100) 
+   }else if(Ball.x <= leftBat.x+80 
             && Ball.x >= leftBat.x
-            && Ball.y+(HEIGHT*1/100) >= leftBat.y 
-            && Ball.y+(HEIGHT*1/100) <= leftBat.y+(HEIGHT*20/100)){
+            && Ball.y+10 >= leftBat.y 
+            && Ball.y <= leftBat.y+180){
       ballHitBatSnd.play();
            ballpath();
-      Ball.x=leftBat.x+7*HEIGHT/100;
+      Ball.x=leftBat.x+20;
        var relativespeed = -Ball.vy-Ball.rotation*ballradius+leftBat.vy;
       impulse = Ball.vx+ballBounceEfficiency*Ball.vx;
        var normal = impulse/delta;
@@ -464,16 +470,16 @@ function gameLoop(){
         Ball.vy+=batBallFrictionCoeff*relativespeed;
         document.getElementById("relativespeed").innerHTML=relativespeed;
    }
-   if(rightBat.y >= YMax-(HEIGHT*19/100)){
-      rightBat.y = YMax-(HEIGHT*19/100);
-   }else if(rightBat.y <= YMin+(HEIGHT/100)){
-      rightBat.y = YMin+(HEIGHT/100);
+   if(rightBat.y >= YMax-180){
+      rightBat.y = YMax-180;
+   }else if(rightBat.y <= YMin){
+      rightBat.y = YMin;
    }
-   if(leftBat.y >= YMax-(HEIGHT*19/100)){
-      leftBat.y = YMax-(HEIGHT*19/100+1);
+   if(leftBat.y >= YMax-180){
+      leftBat.y = YMax-180;
        leftBat.vy=-0.4;
-   }else if(leftBat.y <= YMin+(HEIGHT/100+1)){
-      leftBat.y = YMin+(HEIGHT/100);
+   }else if(leftBat.y <= YMin){
+      leftBat.y = YMin;
        leftBat.vy=+0.4;
    }
     if(leftBat.vy>batClampVelocity)
@@ -523,49 +529,44 @@ function multGameLoop()
     }
     var impulse;
     var angle = Math.atan(Ball.vy / Ball.vx);
-    if (Ball.x + (HEIGHT * 2 / 100) >= rightBat.x
-       && Ball.x + (HEIGHT * 2 / 100) <= rightBat.x + (HEIGHT * 5 / 100)
-       && Ball.y + (HEIGHT * 1 / 100) >= rightBat.y
-       && Ball.y + (HEIGHT * 1 / 100) <= rightBat.y + (HEIGHT * 20 / 100)) {
+    if (Ball.x + 10 >= rightBat.x
+      && Ball.x + 10 <= rightBat.x + 80
+      && Ball.y + 10 >= rightBat.y
+      && Ball.y <= rightBat.y + 180) {
         ballHitBatSnd.play();
-        Ball.x = rightBat.x - 2 * HEIGHT / 100;
+        Ball.x = rightBat.x - 20;
         var relativespeed = -Ball.vy + Ball.rotation * ballradius + rightBat.vy;
         impulse = Ball.vx + ballBounceEfficiency * Ball.vx;
         var normal = impulse / delta;
         Ball.vx -= impulse;
         Ball.rotation -= batSpinFriction * relativespeed / ballradius;
         Ball.vy += batBallFrictionCoeff * relativespeed;
-        connection.send(JSON.stringify({ballpaddlecollisionupdate:Ball,delta:delta}));
         document.getElementById("relativespeed").innerHTML = relativespeed;
-    } else if (Ball.x <= leftBat.x + (HEIGHT * 5 / 100)
+    } else if (Ball.x <= leftBat.x + 80
              && Ball.x >= leftBat.x
-             && Ball.y + (HEIGHT * 1 / 100) >= leftBat.y
-             && Ball.y + (HEIGHT * 1 / 100) <= leftBat.y + (HEIGHT * 20 / 100)) {
+             && Ball.y + 10 >= leftBat.y
+             && Ball.y <= leftBat.y + 180) {
         ballHitBatSnd.play();
         ballpath();
-        Ball.x = leftBat.x + 7 * HEIGHT / 100;
+        Ball.x = leftBat.x + 20;
         var relativespeed = -Ball.vy - Ball.rotation * ballradius + leftBat.vy;
         impulse = Ball.vx + ballBounceEfficiency * Ball.vx;
         var normal = impulse / delta;
         Ball.vx -= impulse;
         Ball.rotation += batSpinFriction * relativespeed / ballradius;
         Ball.vy += batBallFrictionCoeff * relativespeed;
-        connection.send(JSON.stringify({ ballpaddlecollisionupdate: Ball,delta:delta }));
-        //client should animate ball
         document.getElementById("relativespeed").innerHTML = relativespeed;
     }
-        Ball.x += Ball.vx * delta;
-        Ball.y += Ball.vy * delta;
-    if (rightBat.y >= YMax - (HEIGHT * 19 / 100)) {
-        rightBat.y = YMax - (HEIGHT * 19 / 100);
-    } else if (rightBat.y <= YMin + (HEIGHT / 100)) {
-        rightBat.y = YMin + (HEIGHT / 100);
+    if (rightBat.y >= YMax - 180) {
+        rightBat.y = YMax - 180;
+    } else if (rightBat.y <= YMin) {
+        rightBat.y = YMin;
     }
-    if (leftBat.y >= YMax - (HEIGHT * 19 / 100)) {
-        leftBat.y = YMax - (HEIGHT * 19 / 100 + 1);
+    if (leftBat.y >= YMax - 180) {
+        leftBat.y = YMax - 180;
         leftBat.vy = -0.4;
-    } else if (leftBat.y <= YMin + (HEIGHT / 100 + 1)) {
-        leftBat.y = YMin + (HEIGHT / 100);
+    } else if (leftBat.y <= YMin) {
+        leftBat.y = YMin;
         leftBat.vy = +0.4;
     }
     if (leftBat.vy > batClampVelocity) {
@@ -622,12 +623,12 @@ function clientGameLoop()
     }
     var impulse;
     var angle = Math.atan(Ball.vy / Ball.vx);
-    if (Ball.x + (HEIGHT * 2 / 100) >= rightBat.x
-       && Ball.x + (HEIGHT * 2 / 100) <= rightBat.x + (HEIGHT * 5 / 100)
-       && Ball.y + (HEIGHT * 1 / 100) >= rightBat.y
-       && Ball.y + (HEIGHT * 1 / 100) <= rightBat.y + (HEIGHT * 20 / 100)) {
+    if (Ball.x + 10 >= rightBat.x
+       && Ball.x + 10 <= rightBat.x + 80
+       && Ball.y + 10 >= rightBat.y
+       && Ball.y <= rightBat.y + 180) {
         ballHitBatSnd.play();
-        Ball.x = rightBat.x - 2 * HEIGHT / 100;
+        Ball.x = rightBat.x - 20;
         var relativespeed = -Ball.vy + Ball.rotation * ballradius + rightBat.vy;
         impulse = Ball.vx + ballBounceEfficiency * Ball.vx;
         var normal = impulse / delta;
@@ -635,13 +636,13 @@ function clientGameLoop()
         Ball.rotation -= batSpinFriction * relativespeed / ballradius;
         Ball.vy += batBallFrictionCoeff * relativespeed;
         document.getElementById("relativespeed").innerHTML = relativespeed;
-    } else if (Ball.x <= leftBat.x + (HEIGHT * 5 / 100)
+    } else if (Ball.x <= leftBat.x + 80
              && Ball.x >= leftBat.x
-             && Ball.y + (HEIGHT * 1 / 100) >= leftBat.y
-             && Ball.y + (HEIGHT * 1 / 100) <= leftBat.y + (HEIGHT * 20 / 100)) {
+             && Ball.y + 10 >= leftBat.y
+             && Ball.y <= leftBat.y + 180) {
         ballHitBatSnd.play();
         ballpath();
-        Ball.x = leftBat.x + 7 * HEIGHT / 100;
+        Ball.x = leftBat.x + 20;
         var relativespeed = -Ball.vy - Ball.rotation * ballradius + leftBat.vy;
         impulse = Ball.vx + ballBounceEfficiency * Ball.vx;
         var normal = impulse / delta;
@@ -650,18 +651,16 @@ function clientGameLoop()
         Ball.vy += batBallFrictionCoeff * relativespeed;
         document.getElementById("relativespeed").innerHTML = relativespeed;
     }
-        Ball.x += Ball.vx * delta;
-        Ball.y += Ball.vy * delta;
-    if (rightBat.y >= YMax - (HEIGHT * 19 / 100)) {
-        rightBat.y = YMax - (HEIGHT * 19 / 100);
-    } else if (rightBat.y <= YMin + (HEIGHT / 100)) {
-        rightBat.y = YMin + (HEIGHT / 100);
+    if (rightBat.y >= YMax - 180) {
+        rightBat.y = YMax - 180;
+    } else if (rightBat.y <= YMin) {
+        rightBat.y = YMin;
     }
-    if (leftBat.y >= YMax - (HEIGHT * 19 / 100)) {
-        leftBat.y = YMax - (HEIGHT * 19 / 100 + 1);
+    if (leftBat.y >= YMax - 180) {
+        leftBat.y = YMax - 180;
         leftBat.vy = -0.4;
-    } else if (leftBat.y <= YMin + (HEIGHT / 100 + 1)) {
-        leftBat.y = YMin + (HEIGHT / 100);
+    } else if (leftBat.y <= YMin) {
+        leftBat.y = YMin;
         leftBat.vy = +0.4;
     }
     if (leftBat.vy > batClampVelocity) {
